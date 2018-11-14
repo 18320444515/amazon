@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+		
+	<!-- 自动扫描，将整个工程中bo目录下的类注册到spring容器中  -->	
+	<context:component-scan base-package="com.amazon.*.bo" />
+	<context:component-scan base-package="com.amazon.redis.common" />
+	<context:component-scan base-package="com.amazon.weixin.common" />
+	<context:component-scan base-package="com.amazon.common.util" />
+	<context:annotation-config />
+	
+	<!-- 配置使用通用参数 -->
+	<bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">  
+        <property name="locations">  
+            <list>  
+                <value>classpath:amazon.properties</value>  
+            </list>  
+        </property>  
+    </bean>  
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">  
+        <property name="properties" ref="configProperties" />  
+    </bean>  
+	
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="${dataSource}">
+		<property name="driverClassName" value="${driverClass}"/>
+		<property name="url" value="${jdbcUrl}"/>
+		<property name="username" value="${user}"/>
+		<property name="password" value="${password}"/>
+		<property name="initialSize" value="${initialSize}"/>
+		<property name="maxTotal" value="${maxTotal}"/>
+		<property name="maxIdle" value="${maxIdle}"/>
+		<property name="minIdle" value="${minIdle}"/>
+		<property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}"/>
+		<property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}"/>
+	</bean>
+	
+	<!-- spring和MyBatis整合，不需要mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeAliasesPackage" value="com.amazon.common.entity" />
+		<property name="mapperLocations" value="classpath:com/amazon/common/mapper/*.xml" />
+	</bean>
+	
+	<!-- 自动扫描，将整个工程中dao目录下的类注册到spring容器中 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.amazon.*.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+	
+	<!-- 事务管理 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="execution(* com.amazon..bo.*Bo.tx*(..))" id="interceptorPointCuts"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCuts"/>
+	</aop:config>
+</beans>

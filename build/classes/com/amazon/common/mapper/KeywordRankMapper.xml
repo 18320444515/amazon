@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.amazon.keyword.dao.IKeywordRankDao" >
+  <resultMap id="BaseResultMap" type="com.amazon.common.entity.KeywordRank" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="keyword_id" property="keywordId" jdbcType="INTEGER" />
+    <result column="keyword_rank" property="keywordRank" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, keyword_id, keyword_rank, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from keyword_rank
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from keyword_rank
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertSelective" parameterType="com.amazon.common.entity.KeywordRank" >
+    insert into keyword_rank
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="keywordId != null" >
+        keyword_id,
+      </if>
+      <if test="keywordRank != null" >
+        keyword_rank,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="keywordId != null" >
+        #{keywordId,jdbcType=INTEGER},
+      </if>
+      <if test="keywordRank != null" >
+        #{keywordRank,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.amazon.common.entity.KeywordRank" >
+    update keyword_rank
+    <set >
+      <if test="keywordId != null" >
+        keyword_id = #{keywordId,jdbcType=INTEGER},
+      </if>
+      <if test="keywordRank != null" >
+        keyword_rank = #{keywordRank,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryRankList" resultMap="BaseResultMap" parameterType="com.amazon.common.entity.KeywordDetail" >
+    select *
+    from keyword_rank
+    <where>keyword_id = #{keywordId,jdbcType=INTEGER}
+    	<if test="startTime != null" >
+          and create_time  &gt;= #{startTime,jdbcType=REAL}
+        </if>
+        <if test="endTime != null" >
+          and create_time  &lt;= #{endTime,jdbcType=REAL}
+        </if>
+    </where>
+    order by create_time asc
+  </select>
+</mapper>

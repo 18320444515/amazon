@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.amazon.keyword.dao.IKeywordDao" >
+  <resultMap id="BaseResultMap" type="com.amazon.common.entity.Keyword" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="volume" property="volume" jdbcType="INTEGER" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="match_type" property="matchType" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, volume, group_id, match_type
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from keyword
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from keyword
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.amazon.common.entity.Keyword" >
+    insert into keyword
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="volume != null" >
+        volume,
+      </if>
+      <if test="groupId != null" >
+        group_id,
+      </if>
+      <if test="matchType != null" >
+        match_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="volume != null" >
+        #{volume,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="matchType != null" >
+        #{matchType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.amazon.common.entity.Keyword" >
+    update keyword
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="volume != null" >
+        volume = #{volume,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null" >
+        group_id = #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="matchType != null" >
+        match_type = #{matchType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectKeyword" resultMap="BaseResultMap" parameterType="com.amazon.common.entity.Keyword" >
+    select 
+    <include refid="Base_Column_List" />
+    from keyword
+    <where>name = #{name,jdbcType=VARCHAR}
+    	<if test="matchType != null" >
+        and match_type = #{matchType,jdbcType=VARCHAR}
+      </if>
+    </where>limit 1
+  </select>
+  <select id="queryKeywordId" resultType="java.lang.Integer" parameterType="com.amazon.common.entity.Keyword" >
+    select id from keyword
+    <where>1=1
+    	<if test="matchType != null" >
+          and match_type = #{matchType,jdbcType=VARCHAR}
+        </if>
+    </where>
+    limit #{pageStart,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+  </select>
+</mapper>
