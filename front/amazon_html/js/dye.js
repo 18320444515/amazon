@@ -67,6 +67,9 @@ var refresh = function(){
 				$('.hidden_div').show();
 			});
 
+			$('#shadow').click(function(){
+				$('.hidden_div').hide();
+			});
 		})
     })
 }

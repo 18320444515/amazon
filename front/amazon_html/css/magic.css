@@ -30,7 +30,7 @@
 }
 
 .hidden_div{
-	z-index: 9999;
+	z-index: 9;
 	position: fixed;
 	text-align: left;
 }

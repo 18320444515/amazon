@@ -13,7 +13,7 @@
   <link type="text/css" rel="stylesheet" href="./css/palette.css">
   <script type="text/javascript" src="./js/static/echarts.min.js"></script>
 </head>
-<body onload="//$('.hidden_div').hide();">
+<body>
 
 <div class="fixed">
   <nav class="top-bar" data-topbar>
@@ -38,8 +38,11 @@
   </nav>
 </div>
 
-<div class="hidden_div" style="background-color: rgba(0,0,0,0.59);width: 100%;height: 100%;display: none;">
-  <div class="hidden_block" style="width: 52%;background-color: #FFFFFF;margin:35px auto auto auto;">
+<div class="hidden_div" style="width: 100%;height: 100%;display: none;">
+  <div id="shadow" style="background-color: rgba(0,0,0,0.59);width: 100%;height: 100%;z-index: 99;display: flex;">
+    <p> </p>
+  </div>
+  <div class="hidden_block" style="width: 43.6%;background-color: #FFFFFF;position: absolute;left: 26%;top: 3.7%;z-index: 999;">
     <form style="background-color: rgb(218,218,218);padding: 2.5% 0px;">
       <div style="display: flex;margin:0px 0px 0px 3%;">
         <input type="radio" name="exactOrBroad"><p style="margin: 0px;">exact</p>
@@ -93,6 +96,7 @@
       <button class="tiny secondary" onclick="$('#hideFormSubmit').click();" style="margin: 4px 2px 2px 2px;">OK</button>
     </div>
   </div>
+
 </div>
 
 <div class="all primary-text-color">
