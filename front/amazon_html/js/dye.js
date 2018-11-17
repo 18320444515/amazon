@@ -58,7 +58,7 @@ var refresh = function(){
 				$(this).attr('style',$(this).attr('style'));
 			});
 
-			$('.map_button button').click(function(){
+			$('.map_button button,.button').click(function(){
 				$(this).attr('style','background-color: #328BC7;color: white;');
 			});
 
@@ -69,6 +69,11 @@ var refresh = function(){
 
 			$('#shadow').click(function(){
 				$('.hidden_div').hide();
+			});
+
+			$('.pagination li').click(function(){
+				$('.pagination li').attr('class','');
+				$(this).attr('class','current');
 			});
 		})
     })
