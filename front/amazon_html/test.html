@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="./js/static/jquery.min.js"></script>
+	</head>
+	<body>
+		<script>
+			var amazonUrl = "/amazon/";
+			
+			var volumeUrl = "keyword/main/nlIctUpdateVolume.do";
+			var rankUrl = "keyword/rank/nlIctInsertRank.do";
+			var detailUrl = "keyword/detail/nlIctInsertDetail.do";
+			
+			var queryDetail = "keyword/detail/nlIctQueryDetail.do";
+			
+			$(function(){
+				$.getJSON(amazonUrl + queryDetail, function(data){
+					console.log(data)
+				})
+			})
+			
+		</script>
+	</body>
+</html>

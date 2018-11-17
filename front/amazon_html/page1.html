@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BAG DATA</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./css/foundation/foundation.min.css">
+  <script type="text/javascript" src="./js/static/jquery.min.js"></script>
+  <script type="text/javascript" src="./js/static/foundation.min.js"></script>
+  <script type="text/javascript" src="./js/static/modernizr.js"></script>
+  <script type="text/javascript" src="./js/static/vue.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="./css/magic.css">
+  <link type="text/css" rel="stylesheet" href="./css/palette.css">
+  <script type="text/javascript" src="./js/static/echarts.min.js"></script>
+</head>
+<body onload="//$('.hidden_div').hide();">
+
+<div class="fixed">
+  <nav class="top-bar" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+        <!-- 如果你不需要标题或图标可以删掉它 -->
+        <h1><a href="#">OBOO</a></h1>
+      </li>
+        <!-- 小屏幕上折叠按钮: 去掉 .menu-icon 类，可以去除图标。 
+        如果需要只显示图片，可以删除 "Menu" 文本 -->
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="left">
+        <li><a href="./index.html">Home</a></li>
+        <li class="active"><a href="#">Page 1</a></li>
+        <li><a href="#">Page 2</a></li>
+        <li><a href="#">Page 3</a></li> 
+      </ul>
+    </section>
+  </nav>
+</div>
+
+<div class="hidden_div" style="background-color: rgba(0,0,0,0.59);width: 100%;height: 100%;display: none;">
+  <div class="hidden_block" style="width: 52%;background-color: #FFFFFF;margin:35px auto auto auto;">
+    <form style="background-color: rgb(218,218,218);padding: 2.5% 0px;">
+      <div style="display: flex;margin:0px 0px 0px 3%;">
+        <input type="radio" name="exactOrBroad"><p style="margin: 0px;">exact</p>
+        <input type="radio" name="exactOrBroad" style="margin-left: 10%"><p style="margin: 0px;">broad</p>
+      </div>
+      <!-- <input type="radio" name="isBidTest"> -->
+
+      <!-- 条件阈值输入区 -->
+      <p style="margin:0px 0px 0px 3%;">inpression</p>
+      <div class="input_row">
+        <input class="thres_input" type="text" name="impression_min" placeholder="Min" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+        <input class="thres_input" type="text" name="impression_max" placeholder="Max" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+      </div>
+      <p style="margin:0px 0px 0px 3%;">spend</p>
+      <div class="input_row">
+        <input class="thres_input" type="text" name="spend_min" placeholder="Min" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+        <input class="thres_input" type="text" name="spend_max" placeholder="Max" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+      </div>
+      <p style="margin:0px 0px 0px 3%;">inpression</p>
+      <div class="input_row">
+        <input class="thres_input" type="text" name="sales_min" placeholder="Min" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+        <input class="thres_input" type="text" name="sales_max" placeholder="Max" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+      </div>
+      <p style="margin:0px 0px 0px 3%;">Acos(%)</p>
+      <div class="input_row">
+        <input class="thres_input" type="text" name="Acos_min" placeholder="Min" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+        <input class="thres_input" type="text" name="Acos_max" placeholder="Max" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+      </div>
+      <p style="margin:0px 0px 0px 3%;">rank</p>
+      <div class="input_row">
+        <input class="thres_input" type="text" name="rank_min" placeholder="Min" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+        <input class="thres_input" type="text" name="rank_max" placeholder="Max" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+      </div>
+      <p style="margin:0px 0px 0px 3%;">value</p>
+      <div class="input_row">
+        <input class="thres_input" type="text" name="value_min" placeholder="Min" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+        <input class="thres_input" type="text" name="value_max" placeholder="Max" style="margin: 0px;width: 39%;margin: 0% 3% 1% 3%;">
+      </div>
+      
+      <!-- keyword设置 -->
+      <p style="margin:0px 0px 0px 3%;">Find by keyword</p>
+      <input type="text" name="keyword" placeholder="Enter keyword" style="margin:0px 0px 0px 3%;width: 69%;">
+      <!-- 最终按钮 -->
+      <input type="reset" id="hideFormReset" value="Reset" style="display: none;">
+      <input type="submit" id="hideFormSubmit" value="Submit" style="display: none;">
+    </form>
+
+    <div style="display: flex;margin: 2%;text-align: left;">
+      <div style="width: 67%"></div>
+      <button class="tiny" onclick="$('#hideFormReset').click();" style="margin: 4px 2px 2px 2px;">Reset filters</button>
+      <button class="tiny secondary" onclick="$('#hideFormSubmit').click();" style="margin: 4px 2px 2px 2px;">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="all primary-text-color">
+    <!--<div class="fixed tools dark-primary-color">
+      <ul class="side-nav secondary-text-color">
+        <li><a href="#"><img src="./pictures/ic_build_black_48dp.png"></a></li>
+        <li><a href="#"><img src="./pictures/ic_print_black_48dp.png"></a></li>
+        <li><a href="#"><img src="./pictures/ic_star_black_48dp.png"></a></li>
+        <li><a href="#"><img src="./pictures/ic_get_app_black_48dp.png"></a></li>
+        <li><a href="#"><img src="./pictures/ic_watch_later_black_48dp.png"></a></li>
+        <li><a href="#"><img src="./pictures/ic_arrow_upward_black_48dp.png"></a></li>
+      </ul>
+    </div>-->
+  
+
+    <div class="main">
+
+      <div class="filter">
+        <button id="filter_button" style="width: 15%;height: 8%;background-color: #FFC107;margin-right: 5%">Set Filter</button>
+      </div>
+
+      <div class="map" :mapid="index" v-for="(per,index) in map_names">
+
+        <!-- TODO 从这里开始有改动 -->
+        <div class="map_head">
+          <div class="map_title" style="width: 10%;">
+            <h6><b>keyword: <br> {{map_items[index].name}} </b>
+              <br>（{{map_items[index].matchType}}）
+              <br> volume: {{map_items[index].volume}} 
+              <br> Suggested bid: {{map_items[index].sbidLow}},&nbsp;{{map_items[index].sbidMedian}},&nbsp;{{map_items[index].sbidHigh}}</h6>
+          </div>
+          <div class="map_else" style="width: 85%">
+            <div class="map_button" style="width: 44%">
+              <ul class="button-group radius">
+                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">7 days</button></li>
+                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">14 days</button></li>
+                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">1 month</button></li>
+                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">customize</button></li>
+              </ul>
+            </div>
+
+            <div :id="'mapid_'+per" style="width: 100%;height:370px"></div>
+          </div>
+          
+        </div>
+        <!-- 改动到此为止 -->
+        
+      </div>
+    </div> <!-- main end -->
+  
+    <!-- 分页 -->
+    <div class="pagination-centered" style="padding-bottom: 10%">
+      <ul class="pagination">
+        <li class="arrow"><a href="#">«</a></li>
+        <li class="current"><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li class="arrow"><a href="#">»</a></li>
+        <li><input class="small-1" type="text" name="page" placeholder="Page"></li>
+        <li><button class="success">Jump</button></li>
+      </ul>
+    </div>
+
+  
+</div> <!-- all end -->
+
+
+  <!-- 初始化 Foundation JS -->
+  <script>
+  $(document).ready(function() {
+      $(document).foundation();
+  })
+  </script>
+
+	<script type="text/javascript" src="./js/data.js"></script>
+  <script type="text/javascript" src="./js/draw.js"></script>
+  <script type="text/javascript" src="./js/dye.js"></script>
+</body>
+</html>
