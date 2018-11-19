@@ -50,7 +50,7 @@
 }
 
 .map{
-	margin: 0px 0px 80px 0px;
+	margin: 0px 0px 50px 0px;
 }
 
 .all{
@@ -67,11 +67,11 @@
 }
 
 .map_head{
-	display: flex;
+	/*display: flex;*/
 }
 
 .map_else{
-	/*display: block;*/
+	display: flex;
 }
 
 .map_button{

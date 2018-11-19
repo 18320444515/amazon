@@ -67,6 +67,22 @@ var refresh = function(){
 				$('.hidden_div').show();
 			});
 
+			$('#group_open').click(function(){
+				// $('.hidden_div').attr('style','display:block');
+				$('#group_open').hide();
+				$('#group_OK').show();
+				$('.group-checkbox').show();
+				$('.choose_group').show();
+			});
+
+			$('#group_OK').click(function(){
+				// $('.hidden_div').attr('style','display:block');
+				$('#group_OK').hide();
+				$('#group_open').show();
+				$('.group-checkbox').hide();
+				$('.choose_group').hide();
+			});
+
 			$('#shadow').click(function(){
 				$('.hidden_div').hide();
 			});
