@@ -16,5 +16,5 @@ public interface IKeywordDetailDao {
     List<KeywordDetail> queryDetailList(KeywordDetail record);
     
     KeywordDetail queryLatestDetail(KeywordDetail record);
-
+    
 }

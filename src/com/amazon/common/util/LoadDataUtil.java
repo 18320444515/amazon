@@ -193,6 +193,8 @@ public class LoadDataUtil {
 		
 		
 		String rootName = System.getProperty("user.dir");
+//		System.out.println(rootName);
+		
 		String fileName = rootName + "\\data\\keyword\\" + "ADGROUP_KEYWORDS_11_  -11_  -2018.csv";
 //		File file = new File(fileName);
 		

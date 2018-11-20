@@ -24,8 +24,7 @@ public class KeywordRankBo implements IKeywordRankBo{
 	private IKeywordRankDao keywordRankDao;
 
 	@Override
-	public int txInsertBatchRank() {
-		String rootName = "F:\\itmsw_work\\amazon";
+	public int txInsertBatchRank(String rootName) {
 		File dataDir = new File(rootName + "\\data\\rank");
 		
 		CsvReader reader = null;

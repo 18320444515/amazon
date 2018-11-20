@@ -2,13 +2,13 @@
 	var amazonUrl = "/amazon/";
 
 	var queryUrlObj = {
+		"updateExcel": "keyword/main/nlIctUpdateExcel.do",
 		"insertDetail": "keyword/detail/nlIctInsertDetail.do",
 		"insertRank": "keyword/rank/nlIctInsertRank.do",
 		"updateVolume": "keyword/main/nlIctUpdateVolume.do",
 		"queryAllData": "keyword/main/nlIctQueryAllDataById.do",
 		"queryDetail": "keyword/detail/nlIctQueryDetail.do",
-		"queryKeywordList": "keyword/main/nlIctQueryAllDataList.do",
-		"setGruopMutiple": "keyword/main/nlIctSetGroupMutiple.do"
+		"queryKeywordList": "keyword/main/nlIctQueryAllDataList.do"
 	}
 	
 	var sendAjax = function(name, params, success){

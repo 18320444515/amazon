@@ -9,6 +9,7 @@
   <script type="text/javascript" src="./js/static/foundation.min.js"></script>
   <script type="text/javascript" src="./js/static/modernizr.js"></script>
   <script type="text/javascript" src="./js/static/vue.min.js"></script>
+  <script type="text/javascript" src="https://cdn.bootcss.com/lodash.js/4.17.11/lodash.min.js"></script>
   <link type="text/css" rel="stylesheet" href="./css/magic.css">
   <link type="text/css" rel="stylesheet" href="./css/palette.css">
   <script type="text/javascript" src="./js/static/echarts.min.js"></script>
@@ -31,8 +32,8 @@
       <ul class="left">
         <li><a href="./index.html">Home</a></li>
         <li class="active"><a href="#">Page 1</a></li>
-        <li><a href="./page2.html">Page 2</a></li>
-        <li><a href="./page3.html">Page 3</a></li> 
+        <li><a href="#">Page 2</a></li>
+        <li><a href="./test.html">Test</a></li> 
       </ul>
     </section>
   </nav>
@@ -54,8 +55,6 @@
       </div>
       <!-- 精确 / 广泛 -->
       <div style="display: flex;margin:10px 0px 0px 3%;">
-        <input type="radio" name="exactOrBroad" style="margin: 0px"><p style="margin: 0px;padding-bottom: 16px;">exact</p>
-        <input type="radio" name="exactOrBroad" style="margin: 0px 0px 0px 10%"><p style="margin: 0px;padding-bottom: 16px">broad</p>
         <!-- 天数 -->
         <div class="map_button" style="display: flex;margin:0px 0px 0px 3%;left: 1%;">
           <ul class="button-group radius">
@@ -66,6 +65,8 @@
           </ul>
         </div>
       </div>
+      <!--<input type="radio" name="exactOrBroad" style="margin: 0px"><p style="margin: 0px;padding-bottom: 16px;">exact</p>
+      <input type="radio" name="exactOrBroad" style="margin: 0px 0px 0px 10%"><p style="margin: 0px;padding-bottom: 16px">broad</p>-->
       <!-- <input type="radio" name="isBidTest"> -->
 
       <!-- 条件阈值输入区 -->
@@ -118,92 +119,52 @@
 </div>
 
 <div class="all primary-text-color">
-    <!--<div class="fixed tools dark-primary-color">
-      <ul class="side-nav secondary-text-color">
-        <li><a href="#"><img src="./pictures/ic_build_black_48dp.png"></a></li>
-        <li><a href="#"><img src="./pictures/ic_print_black_48dp.png"></a></li>
-        <li><a href="#"><img src="./pictures/ic_star_black_48dp.png"></a></li>
-        <li><a href="#"><img src="./pictures/ic_get_app_black_48dp.png"></a></li>
-        <li><a href="#"><img src="./pictures/ic_watch_later_black_48dp.png"></a></li>
-        <li><a href="#"><img src="./pictures/ic_arrow_upward_black_48dp.png"></a></li>
-      </ul>
-    </div>-->
-  
 
     <div class="main">
 
       <div class="filter">
-        <button id="group_open" class="success" style="width: 15%;height: 8%;margin-right: 5%">Set Groups</button>
-        <button id="group_OK" class="info" style="width: 15%;height: 8%;margin-right: 5%;display: none;">Groups OK</button>
-        <button id="filter_button" style="width: 15%;height: 8%;background-color: #FFC107;margin-right: 5%">Set Filter</button>
-      </div>
-    
-      <div class="choose_group" style="display: none;">
-        <label for="group_selected" style="font-size: 20px;">Select a group: 
-          <select id="group_selected">
-            <option>group name</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-          </select>
-        </label>
+      	<span class="filter-title">Keywords</span>
+        <button id="filter_button" style="padding: 10px 20px;border-radius:5px;background-color: #FFC107;margin-right: 10px">筛选</button>
+        <button id="excel_button" style="padding: 10px 20px;border-radius:5px;background-color: #328BC7;margin-right: 10px">录入</button>
+        <button id="total_button">total</button>
       </div>
 
       <div class="map" :mapid="index" v-for="(per,index) in map_names">
 
-        
+        <!-- TODO 从这里开始有改动 -->
         <div class="map_head">
-          <div style="display: flex;">
-            <div class="group-checkbox" style="display: none;position: absolute;margin:1rem 0 0 1rem;">
-              <input type="checkbox" :name="index" style="margin:2rem 0 0 1rem;">
+          <div class="map_title" style="width: 10%;">
+            <h6><b>{{map_items[index].name}} </b>
+              <br>({{map_items[index].matchType}})
+              <br> volume: {{map_items[index].volume}} 
+              <br> Suggested bid: <span style="display: block;margin-left: 20px;margin-top: 5px;">{{map_items[index].sbidLow}}<br>{{map_items[index].sbidMedian}}<br>{{map_items[index].sbidHigh}}</span></h6>
+          </div>
+          <div class="map_else" style="width: 80%;margin-left: 10px;">
+            <div class="map_button">
+            	<div class="button-box">
+            		<div class="time-input" :id="'time_'+per">
+		        		From<input style="margin:0px;width: 39%;height: 1%;" type="date" class="small" name="begin">
+			        	to<input style="margin:0px;width: 39%;height: 1%;" type="date" class="small" name="end">
+			        </div>
+			        <button class="small" data-day="0">customize</button>
+            		<button class="small active" data-day="1">7 days</button>
+            		<button class="small" data-day="2">14 days</button>
+            		<button class="small" data-day="3">1 month</button>
+            	</div>
+            	
             </div>
-            <div class="map_button" style="width: 44%">
-              <ul class="button-group radius">
-                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">7 days</button></li>
-                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">14 days</button></li>
-                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">1 month</button></li>
-                <li><button class="small" style="background-color: #DAE1E7;color: #757575;">customize</button></li>
-              </ul>
-            </div>
+						
+            <div :id="'mapid_'+per" style="width: 100%;height:400px"></div>
           </div>
           
-          <div class="map_else" style="width: 85%">
-            <div class="map_title" style="width: 10%;">
-              <h6><b>{{map_items[index].name}} </b>
-                <br> -----
-                <br>（{{map_items[index].matchType}}）
-                <br> -----
-                <br> volume: {{map_items[index].volume}} 
-                <br> -----
-                <br> Suggested bid: 
-                <br> (low) {{map_items[index].sbidLow}},
-                <br> (mid) {{map_items[index].sbidMedian}},
-                <br> (high) {{map_items[index].sbidHigh}}</h6>
-            </div>
-            <div :id="'mapid_'+per" style="width: 100%;height:370px"></div>
-          </div>
-          
-        </div><!-- map_head end -->
-        
+        </div>
+        <!-- 改动到此为止 -->
         
       </div>
+      <div class="more-btn" @click="updateChart">加载更多</div>
     </div> <!-- main end -->
-  
+  	
     <!-- 分页 -->
-    <div class="pagination-centered" style="padding-bottom: 10%">
-      <ul class="pagination">
-        <li class="arrow"><a href="#">«</a></li>
-        <li class="current"><a href="#">1</a></li>
-        <li><a href="#">2</a></li>
-        <li><a href="#">3</a></li>
-        <li><a href="#">4</a></li>
-        <li><a href="#">5</a></li>
-        <li class="arrow"><a href="#">»</a></li>
-        <li><input class="small-1" type="text" name="page" placeholder="Page"></li>
-        <li><button class="success">Jump</button></li>
-      </ul>
-    </div>
 
   
 </div> <!-- all end -->

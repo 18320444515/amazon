@@ -22,11 +22,13 @@
 .main{
 	
 	/*background-color: blue;*/
-	padding: 18px 50px 70px 40px;
+	padding: 18px 50px 0px 40px;
 }
 
 .filter{
-	text-align: center;
+	/*text-align: center;*/
+	position: relative;
+	margin-bottom: 20px;
 }
 
 .hidden_div{
@@ -50,7 +52,7 @@
 }
 
 .map{
-	margin: 0px 0px 50px 0px;
+	margin: 0px 0px 80px 0px;
 }
 
 .all{
@@ -67,16 +69,63 @@
 }
 
 .map_head{
-	/*display: flex;*/
+	display: flex;
 }
 
 .map_else{
-	display: flex;
+	/*display: block;*/
 }
 
 .map_button{
     /*right: 0px;*/
     position: relative;
     display: block;
-    left: 64%;
+    height: 60px;
+    /*left: 64%;*/
+}
+.map_button>.button-box{
+	position: absolute;
+	right: 0;
+}
+.button-box>button{
+    background-color: rgb(218, 225, 231);
+    color: rgb(117, 117, 117);
+}
+.button-box>button.active{
+	background-color: #328BC7;
+	color: white;
+}
+.button-box>.time-input{
+	position: relative;
+	display: inline-block;
+	
+}
+.filter-title{
+	position: relative;
+	font-size: 26px;
+	margin-right: 20px;
+}
+.time-input>input{
+	position: relative;
+	display: inline-block;
+}
+.more-btn{
+	position: relative;
+	padding: 20px 0;
+	text-align: center;
+	font-size: 16px;
+	background-color: #F5F5F5;
+	cursor: pointer;
+	margin-bottom: 30px;
+}
+#total_button{
+	padding: 10px 20px;
+	border-radius:5px;
+	background-color: #f5f5f5;
+	color: #333;
+	margin-right: 10px;
+}
+#total_button.active{
+	background-color: #f04124;
+	color: #fff;
 }

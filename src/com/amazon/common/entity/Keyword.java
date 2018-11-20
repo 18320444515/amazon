@@ -23,6 +23,8 @@ public class Keyword extends BaseEntity implements Serializable{
     private Long startTime;
     
     private Long endTime;
+    
+    private Integer dayFlag;
 
     public Integer getId() {
         return id;
@@ -102,5 +104,13 @@ public class Keyword extends BaseEntity implements Serializable{
 
 	public void setLatestDetail(KeywordDetail latestDetail) {
 		this.latestDetail = latestDetail;
+	}
+
+	public Integer getDayFlag() {
+		return dayFlag;
+	}
+
+	public void setDayFlag(Integer dayFlag) {
+		this.dayFlag = dayFlag;
 	}
 }

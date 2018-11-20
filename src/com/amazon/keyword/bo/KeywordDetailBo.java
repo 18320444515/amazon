@@ -26,85 +26,16 @@ public class KeywordDetailBo implements IKeywordDetailBo{
 	private IKeywordDao keywordDao;
 	@Resource
 	private IKeywordDetailDao keywordDetailDao;
-
+	
 	@Override
-	public int txInsertBatchDetail() {
-		String rootName = "F:\\itmsw_work\\amazon";
-		File dataDir = new File(rootName + "\\data\\keyword");
-		
-		Workbook wb =null;
-        Sheet sheet = null;
-        Row row = null;
-        
-        Keyword keyword = new Keyword();
-		Keyword existKeyword = new Keyword();
-		KeywordDetail keywordDetail = new KeywordDetail();
-		Integer keywordId = null;
-        
-        File[] files = dataDir.listFiles();
-        for (File file : files) {
-			if(file.isDirectory()) continue;
-			if(!LoadDataUtil.canFileUse(file.getName())) continue;
-			
-			wb = LoadDataUtil.readExcel(file.getAbsolutePath());
-	        if(wb != null){
-	            //用来存放表中数据
-	//            list = new ArrayList<Map<String,String>>();
-	            //获取第一个sheet
-	            sheet = wb.getSheetAt(0);
-	            //获取最大行数
-	            int rownum = sheet.getPhysicalNumberOfRows();
-	            //获取第一行
-	            row = sheet.getRow(0);
-	            //获取最大列数
-//	            int colnum = row.getPhysicalNumberOfCells();
-	            for (int i = 1; i < rownum; i++) {
-	//                Map<String,String> map = new LinkedHashMap<String,String>();
-	                row = sheet.getRow(i);
-	                if(row != null){
-	                	keyword.setName((String)LoadDataUtil.getCellFormatValue(row.getCell(1)));
-	                	keyword.setMatchType((String)LoadDataUtil.getCellFormatValue(row.getCell(2)));
-//	                	System.out.println(keyword.getName() + "--" + keyword.getMatchType());
-//	                	System.out.println(keywordDao);
-	                	existKeyword = keywordDao.selectKeyword(keyword);
-	                	if(existKeyword == null){
-	                		keyword.setId(null);
-	                		keywordDao.insertSelective(keyword);
-	                		keywordId = keyword.getId();
-	                	}else{
-	                		keywordId = existKeyword.getId();
-	                	}
-	                	
-	                	System.out.println(keywordId);
-	                	keywordDetail.setKeywordId(keywordId);
-	                	keywordDetail.setSbidLow(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(4))));
-	                	keywordDetail.setSbidMedian(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(5))));
-	                	keywordDetail.setSbidHigh(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(6))));
-	                	keywordDetail.setKeywordBid(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(7))));
-	                	keywordDetail.setImpression((int)Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(8))));
-	                	keywordDetail.setSpend(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(11))));
-	                	keywordDetail.setCpc(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(12))));
-	                	keywordDetail.setOrders((int)Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(13))));
-	                	keywordDetail.setSales(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(13))));
-	                	keywordDetail.setCreateTime(new Date().getTime());
-//	                	keywordDetail.setMatchType((String)LoadDataUtil.getCellFormatValue(row.getCell(2)));
-	                	
-	                	keywordDetailDao.insertSelective(keywordDetail);
-	                }
-//	                System.out.println("-----------------");
-	            }
-	        }
-	        
-	        System.out.println(LoadDataUtil.changeFileName(file, "OK_" + file.getName()));
-        }
-        
-		return 0;
+	public Object queryDetailList(KeywordDetail keywordDetail) {
+		return keywordDetailDao.queryDetailList(keywordDetail);
 	}
-
+	
 	@Override
-	public int txInserBatchDetailCSV() {
-		String rootName = "F:\\itmsw_work\\amazon";
+	public int txInserBatchDetailCSV(String rootName) {
 		File dataDir = new File(rootName + "\\data\\keyword");
+		System.out.println(dataDir.getAbsolutePath());
 		
 		CsvReader reader = null;
 		ArrayList<String[]> csvList = null;
@@ -183,10 +114,80 @@ public class KeywordDetailBo implements IKeywordDetailBo{
         
 		return 0;
 	}
-
+	
 	@Override
-	public Object queryDetailList(KeywordDetail keywordDetail) {
-		return keywordDetailDao.queryDetailList(keywordDetail);
+	public int txInsertBatchDetail(String rootName) {
+		File dataDir = new File(rootName + "\\data\\keyword");
+		System.out.println(dataDir.getAbsolutePath());
+		
+		Workbook wb =null;
+        Sheet sheet = null;
+        Row row = null;
+        
+        Keyword keyword = new Keyword();
+		Keyword existKeyword = new Keyword();
+		KeywordDetail keywordDetail = new KeywordDetail();
+		Integer keywordId = null;
+        
+        File[] files = dataDir.listFiles();
+        for (File file : files) {
+			if(file.isDirectory()) continue;
+			if(!LoadDataUtil.canFileUse(file.getName())) continue;
+			
+			wb = LoadDataUtil.readExcel(file.getAbsolutePath());
+	        if(wb != null){
+	            //用来存放表中数据
+	//            list = new ArrayList<Map<String,String>>();
+	            //获取第一个sheet
+	            sheet = wb.getSheetAt(0);
+	            //获取最大行数
+	            int rownum = sheet.getPhysicalNumberOfRows();
+	            //获取第一行
+	            row = sheet.getRow(0);
+	            //获取最大列数
+//	            int colnum = row.getPhysicalNumberOfCells();
+	            for (int i = 1; i < rownum; i++) {
+	//                Map<String,String> map = new LinkedHashMap<String,String>();
+	                row = sheet.getRow(i);
+	                if(row != null){
+	                	keyword.setName((String)LoadDataUtil.getCellFormatValue(row.getCell(1)));
+	                	keyword.setMatchType((String)LoadDataUtil.getCellFormatValue(row.getCell(2)));
+//	                	System.out.println(keyword.getName() + "--" + keyword.getMatchType());
+//	                	System.out.println(keywordDao);
+	                	existKeyword = keywordDao.selectKeyword(keyword);
+	                	if(existKeyword == null){
+	                		keyword.setId(null);
+	                		keywordDao.insertSelective(keyword);
+	                		keywordId = keyword.getId();
+	                	}else{
+	                		keywordId = existKeyword.getId();
+	                	}
+	                	
+	                	System.out.println(keywordId);
+	                	keywordDetail.setKeywordId(keywordId);
+	                	keywordDetail.setSbidLow(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(4))));
+	                	keywordDetail.setSbidMedian(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(5))));
+	                	keywordDetail.setSbidHigh(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(6))));
+	                	keywordDetail.setKeywordBid(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(7))));
+	                	keywordDetail.setImpression((int)Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(8))));
+	                	keywordDetail.setSpend(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(11))));
+	                	keywordDetail.setCpc(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(12))));
+	                	keywordDetail.setOrders((int)Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(13))));
+	                	keywordDetail.setSales(Float.parseFloat((String)LoadDataUtil.getCellFormatValue(row.getCell(13))));
+	                	keywordDetail.setCreateTime(new Date().getTime());
+//	                	keywordDetail.setMatchType((String)LoadDataUtil.getCellFormatValue(row.getCell(2)));
+	                	
+	                	keywordDetailDao.insertSelective(keywordDetail);
+	                }
+//	                System.out.println("-----------------");
+	            }
+	        }
+	        
+	        System.out.println(LoadDataUtil.changeFileName(file, "OK_" + file.getName()));
+        }
+        
+		return 0;
 	}
+
 	
 }

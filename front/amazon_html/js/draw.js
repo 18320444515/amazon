@@ -17,32 +17,6 @@ var CONFIG = {
 
 /* 专门存放数据 */
 var DATA = {
-	/* 此数据用于block2 */
-	// BLOCK2: {
-	// 	CATEGORY: ["10/29/2018","10/30/2018","11/1/2018","11/2/2018","11/3/2018","11/4/2018"],/* X轴的文字描述信息（可以改为日期数组） */
-
-	// 	/* 下面是对应于 NAME[] 的详细数据 */
-	// 	IMPRESSION:[56,123,89,12,47,512],
-	// 	SPEND:[11,55,33,44,22,77],
-	// 	SALES:[89,154,222,333,111,99],
-	// 	ACOS:[80,56,77,45,35,91],
-	// 	RANK:[46,123,356,145,253,444],
-	// 	VALUE:[355,244,488,189,444,333],
-
-	// 	KEYWORD: "(default keyword)",
-
-	// 	countMonthGrade:function(){
-	// 		var rt = [];
-
-	// 		for (var i = 0; i < CONFIG.NAME.length - 1; i++) {
-	// 			result = calculate( this.IMPRESSION[i], this.SPEND[i], this.SALES[i], this.ACOS[i], this.RANK[i], this.VALUE[i]);
-	// 			rt.push(result);
-	// 		}
-
-	// 		return rt;
-	// 	}
-	// },
-
     /* 用于测试的假数据 */
     FAKE: {
         CurrentIndex: 0,
@@ -131,30 +105,10 @@ var initFake = function(){
 }
 
 /**
- * 
- * @param {Object} totalList
- */
-var getTotalChartData = function(totalList){
-	DATA.FAKE.KEYWORD_NAME = [];
-	DATA.FAKE.KEYWORD_DATA = [];
-    DATA.FAKE.CurrentIndex = 0;
-    
-    var totalData = null;
-    var temp = null;
-    for(var t in totalList){
-    	totalData = totalList[t];
-    	temp = getSingleChartData(totalData);
-    	
-    	DATA.FAKE.KEYWORD_NAME.push(totalData.id);
-		DATA.FAKE.KEYWORD_DATA.push(temp);
-    }
-}
-
-/**
  * 获取单个关键词图表数据
  * @param {Object} totalData
  */
-var getSingleChartData = function(totalData){
+var getSingleChartData = function(totalData, dayObj){
 	var detailData = totalData.detailList;
 	var rankData = totalData.rankList;
 	var latestDetail = totalData.latestDetail;
@@ -163,6 +117,7 @@ var getSingleChartData = function(totalData){
     
     var temp = {
     	threshold: [],
+    	type: [],
         date: [],
 //      dateRank: [],
         impression: [],
@@ -187,29 +142,49 @@ var getSingleChartData = function(totalData){
     	temp.sbidHigh = latestDetail.sbidHigh;
     }
     
-    
-	var formatObj = formatData(detailData, rankData);
-	temp.threshold = formatObj.threshold;
+	var formatObj = formatData(totalData, dayObj);
 	timeObj = formatObj.timeObj;
 	timeArr = formatObj.timeArr;
 	
 	var oldAcos = formatObj.oldValue.Acos;
 	var oldRank = formatObj.oldValue.rank;
 	
+	var totalObj = {
+		"time": 0,
+		"impression": 0,
+		"bid": 0,
+		"spend": 0,
+		"sales": 0,
+		"order": 0,
+		"Acos": 0,
+		"rank": 0
+	}
 	for(var t in timeArr){
 		timeStamp = timeArr[t];
 		timeItem = timeObj[timeStamp];
-		console.log(timeItem)
+//		console.log(timeItem)
 		temp.date.push( timestampToTime(timeStamp) );
 		if(timeItem.type == "detail"){
+			totalObj.time += 1;
+			temp.type.push(0);
 			temp.impression.push(timeItem.item.impression);
+			totalObj.impression += timeItem.item.impression;
+			
         	temp.bid.push(timeItem.item.keywordBid);
+        	totalObj.bid += timeItem.item.keywordBid;
+        	
         	temp.spend.push(timeItem.item.spend);
+        	totalObj.spend += timeItem.item.spend;
+        	
         	temp.sales.push(timeItem.item.sales);
+        	totalObj.sales += timeItem.item.sales;
+        	
         	temp.order.push(timeItem.item.orders);
-        
+        	totalObj.order += timeItem.item.orders;
+        	
         	if(!timeItem.item.acos) timeItem.item.acos = 0;
-        	temp.Acos.push(timeItem.item.acos);
+        	temp.Acos.push(timeItem.item.acos.toFixed(2));
+        	totalObj.Acos += timeItem.item.acos;
         	
         	oldAcos = timeItem.item.acos;
         	
@@ -219,7 +194,8 @@ var getSingleChartData = function(totalData){
         	}else{
         		temp.rank.push(oldRank);
         	}
-		}else{
+		}else if(timeItem.type == "rank"){
+			temp.type.push(1);
 			temp.impression.push("-");
         	temp.bid.push("-");
         	temp.spend.push("-");
@@ -228,9 +204,60 @@ var getSingleChartData = function(totalData){
         	temp.Acos.push(oldAcos);
         	temp.rank.push(timeItem.item.keywordRank);
         	oldRank = timeItem.item.keywordRank;
+		}else{
+			temp.type.push(2);
+			temp.impression.push("-");
+        	temp.bid.push("-");
+        	temp.spend.push("-");
+        	temp.sales.push("-");
+        	temp.order.push("-");
+			temp.rank.push(oldRank);
+			temp.Acos.push(oldAcos);
 		}
-		
 	}
+	
+	var thresholdArr = formatObj.threshold;
+	var impressionArr = thresholdArr[0];
+	var bidArr = thresholdArr[1];
+	var rankArr = thresholdArr[2];
+	var AcosArr = thresholdArr[3];
+	
+	var totalBid = parseFloat(new Number((totalObj.bid / totalObj.time)).toFixed(2));
+	var totalAcos = parseFloat(new Number((totalObj.Acos / totalObj.time)).toFixed(2));
+	
+	temp.type.push(2);
+	temp.type.push(0);
+	temp.date.push("total");
+	temp.date.push("total");
+	temp.impression.push("-");
+	temp.impression.push(totalObj.impression);
+	impressionArr.push(totalObj.impression);
+	
+	temp.bid.push("-");
+	temp.bid.push(totalBid);
+	bidArr.push(totalBid);
+	
+	temp.spend.push("-");
+	temp.sales.push("-");
+	temp.order.push("-");
+	temp.Acos.push(totalAcos);
+	temp.spend.push(totalObj.spend.toFixed(2));
+	temp.sales.push(totalObj.sales.toFixed(2));
+	temp.order.push(totalObj.order);
+	temp.Acos.push(totalAcos);
+	AcosArr.push(totalAcos);
+	
+	temp.rank.push(temp.rank[temp.rank.length-1]);
+	temp.rank.push(temp.rank[temp.rank.length-1])
+	
+	thresholdArr = [];
+	thresholdArr.push(getThreshold(impressionArr, 1))
+	thresholdArr.push(getThreshold(bidArr, 4))
+	thresholdArr.push(getThreshold(rankArr, 2))
+	thresholdArr.push(getThreshold(AcosArr, 3))
+	
+	temp.threshold = thresholdArr;
+//	console.log(temp.threshold)
 //	console.log(temp)
 	return temp;
 }
@@ -240,7 +267,11 @@ var getSingleChartData = function(totalData){
  * @param {Object} detailData
  * @param {Object} rankData
  */
-function formatData(detailData, rankData){
+function formatData(totalData, dayObj){
+	var detailData = totalData.detailList;
+	var rankData = totalData.rankList;
+	var latestDetail = totalData.latestDetail;
+	
 	var impressionArr = [];
     var bidArr = [];
     var rankArr = [];
@@ -287,18 +318,47 @@ function formatData(detailData, rankData){
 		
 		rankArr.push(rankItem.keywordRank);
 	}
-	console.log(timeArr)
-	console.log(timeObj)
+	
+	var endTime = latestDetail.createTime;
+	var dayMs = 24 * 60 * 60 * 1000;
+	
+	var days = 0;
+	var dayFlag = dayObj.dayFlag;
+	if(dayFlag == 0){
+		endTime = dayObj.endTime + dayMs;
+		days = (dayObj.endTime - dayObj.startTime) / dayMs + 2;
+	}else if(dayFlag == 1){
+		days = 7
+	}else if(dayFlag == 2){
+		days = 14
+	}else if(dayFlag == 3){
+		days = 30
+	}
+	console.log(dayFlag)
+	
+	for(var d = 1;d < days;d++){
+		timeStamp = endTime - (dayMs * d);
+		detailItem = timeObj[timeStamp];
+		if(!detailItem){
+			timeArr.push(timeStamp);
+			timeObj[timeStamp] = {
+				"type": "null"
+			}
+		}
+//		console.log(d)
+	}
+//	console.log(timeArr)
+//	console.log(timeObj)
 	
 	var oldValue = {
 		"Acos": AcosArr[0],
 		"rank": rankArr[0]
 	}
 	var thresholdArr = [];
-	thresholdArr.push(getThreshold(impressionArr, 1))
-	thresholdArr.push(getThreshold(bidArr, 1))
-	thresholdArr.push(getThreshold(rankArr, 2))
-	thresholdArr.push(getThreshold(AcosArr, 3))
+	thresholdArr.push(impressionArr);
+	thresholdArr.push(bidArr);
+	thresholdArr.push(rankArr);
+	thresholdArr.push(AcosArr);
 	
 	timeArr.sort(function(a, b){
 		return a - b
@@ -309,7 +369,7 @@ function formatData(detailData, rankData){
 		"threshold": thresholdArr,
 		"oldValue": oldValue
 	}
-	console.log(formatObj);
+//	console.log(formatObj);
 	return formatObj;
 }
 
@@ -322,6 +382,7 @@ function getThreshold(arr, type){
 	arr.sort(function(a, b){
 		return a - b
 	});
+//	console.log(arr)
 	var max = arr[arr.length - 1];
 	var min = arr[0];
 	if(min > 0) min = 0;
@@ -330,15 +391,17 @@ function getThreshold(arr, type){
 	if(type == 1){
 		max += diff * 2;
 	}else if(type == 2){
-		min -= diff * 0.8;
+		min -= diff * 0.6;
 		max += diff;
 	}else if(type == 3){
 		max += 20;
 		min -= 80;
+	}else if(type == 4){
+		max += diff * 15;
 	}
 	
 	var threshold = {"max": Math.floor(max), "min": Math.floor(min)};
-	console.log(threshold);
+//	console.log(threshold);
 	return threshold;
 }
 
@@ -361,6 +424,8 @@ var ITEM_STYLE_1 = {
         label: {
             show: true, 
             position: 'top',
+            offset: [0, -5],
+            align: 'center',
             formatter:"{c}"
         }
     }
@@ -370,6 +435,7 @@ var ITEM_STYLE_4 = {
         label: {
             show: true, 
             position: 'top',
+            align: 'center',
             formatter:"${c}"
         }
     }
@@ -379,7 +445,38 @@ var ITEM_STYLE_2 = {
         label: {
             show: true, 
             position: 'top',
-            formatter:"{c}"
+            offset: [-12, 0],
+            formatter:function(params){
+            	var index = params.dataIndex; /* 当前对应横坐标的下标 */
+            	var p = DATA.FAKE.CurrentIndex;
+            	var rt = "";
+//          	console.log(params.data)
+            	var length = DATA.FAKE.KEYWORD_DATA[p].rank.length;
+            	
+            	if(!df.totalFlag){
+            		var type = DATA.FAKE.KEYWORD_DATA[p].type[index];
+            		if(type == 2) return "";
+            	}else{
+            		index = length - 1;
+            	}
+//          	console.log("456--" + type)
+            	
+            	if(index == (length - 1)){
+            		var firstRank = DATA.FAKE.KEYWORD_DATA[p].rank[0];
+            		var lastRank = DATA.FAKE.KEYWORD_DATA[p].rank[index];
+            		var diffRank = lastRank - firstRank;
+//          		console.log(firstRank + "--" + lastRank)
+            		if(diffRank > 0){
+            			rt = "+" + diffRank;
+            		}else{
+            			rt = diffRank;
+            		}
+            		
+            	}else{
+            		rt = params.data;
+            	}
+            	return rt;
+            }
         },
         lineStyle: {
             width: 3,
@@ -395,22 +492,32 @@ var ITEM_STYLE_3 = {
             show: true, 
             position: 'top',
             distance: 10,
+            fontSize: 12,
             color: '#000',
-            offset: [-50, 0],
-            align: 'left',
+            offset: [0, 0],
+            fontWeight: 'bolder',
+            align: 'right',
             formatter:function(params){
             	var index = params.dataIndex; /* 当前对应横坐标的下标 */
                 var p = DATA.FAKE.CurrentIndex;
-            	var order = DATA.FAKE.KEYWORD_DATA[p].order[index];
-            	if(order == "-") return "";
+//              console.log(p)
+				var order = null;
+                if(!df.totalFlag){
+                	order = DATA.FAKE.KEYWORD_DATA[p].order[index];
+            		if(order == "-") return "";
+                }else{
+                	index = DATA.FAKE.KEYWORD_DATA[p].Acos.length - 1;
+                	order = DATA.FAKE.KEYWORD_DATA[p].order[index];
+                }
+                console.log(index)
             	
             	var rt = "";
-            	console.log('p = '+p+"\nparams = "+params);
+//          	console.log('p = '+p+"\nparams = "+params);
             	
-            	rt += 'order：' + order +
-            		'\nsales：$' + DATA.FAKE.KEYWORD_DATA[p].sales[index] + 
-            		'\nspend：$' + DATA.FAKE.KEYWORD_DATA[p].spend[index] +
-            		'\n\n' + DATA.FAKE.KEYWORD_DATA[p].Acos[index] + "%Acos";
+            	rt += 'order:' + order +
+            		'\nsal:$' + DATA.FAKE.KEYWORD_DATA[p].sales[index] + 
+            		'\nspe:$' + DATA.FAKE.KEYWORD_DATA[p].spend[index] +
+            		'\n\nAcos:' + DATA.FAKE.KEYWORD_DATA[p].Acos[index] + "%";
             	
             	return rt;
             }
@@ -428,7 +535,30 @@ var ITEM_STYLE_3 = {
 
 
 /* CONFIG.NAME: ['impression','bid','rank','Acos(%)'] */
-var getMapOptionByIndex = function(index){
+var getMapOptionByIndex = function(index, totalFlag){
+	var mapData = DATA.FAKE.KEYWORD_DATA[index];
+	var mapLength = mapData.date.length;
+	var showLength = 12;
+	var zoomStart = 0;
+	if(mapLength > showLength){
+		zoomStart = 100 - parseFloat(new Number((showLength / mapData.date.length)).toFixed(2)) * 100;
+	}
+	
+	var dateArr = mapData.date;
+	var impressArr = mapData.impression;
+	var bidArr = mapData.bid;
+	var rankArr = mapData.rank;
+	var AcosArr = mapData.Acos;
+	
+	if(totalFlag){
+		dateArr = dateArr.slice(-1);
+		impressArr = impressArr.slice(-1);
+		bidArr = bidArr.slice(-1);
+		rankArr = rankArr.slice(-1);
+		AcosArr = AcosArr.slice(-1);
+	}
+	console.log(impressArr)
+	
     var option_block = {
         /* 全局调色 */
         color : CONFIG.COLOR,
@@ -469,15 +599,7 @@ var getMapOptionByIndex = function(index){
             {
                 /* 这个是横坐标的相关设置（主要是名称）*/
                 type : 'category',
-                data : DATA.FAKE.KEYWORD_DATA[index].date,
-                splitLine: {
-                    show: false
-                }
-            },{
-                /* 这个是横坐标的相关设置（主要是名称）*/
-                type : 'time',
-                position: 'top',
-                data : DATA.FAKE.KEYWORD_DATA[index].dateRank,
+                data : dateArr,
                 splitLine: {
                     show: false
                 }
@@ -487,8 +609,8 @@ var getMapOptionByIndex = function(index){
             {
                 type : 'value',
                 name: 'Impression',
-                min: DATA.FAKE.KEYWORD_DATA[index].threshold[0].min,
-                max: DATA.FAKE.KEYWORD_DATA[index].threshold[0].max,
+                min: mapData.threshold[0].min,
+                max: mapData.threshold[0].max,
                 position: 'left',
                 axisLine: {
                     lineStyle: {
@@ -502,8 +624,8 @@ var getMapOptionByIndex = function(index){
             {
                 type : 'value',
                 name: 'Bid',
-                min: DATA.FAKE.KEYWORD_DATA[index].threshold[1].min,
-                max: DATA.FAKE.KEYWORD_DATA[index].threshold[1].max,
+                min: mapData.threshold[1].min,
+                max: mapData.threshold[1].max,
 				offset: 50,
                 position: 'left',
                 axisLine: {
@@ -518,8 +640,8 @@ var getMapOptionByIndex = function(index){
             {
                 type : 'value',
                 name: 'Rank',
-               	min: DATA.FAKE.KEYWORD_DATA[index].threshold[2].min,
-                max: DATA.FAKE.KEYWORD_DATA[index].threshold[2].max,
+               	min: mapData.threshold[2].min,
+                max: mapData.threshold[2].max,
                 position: 'right',
                 offset: 0,
                 axisLine: {
@@ -534,8 +656,8 @@ var getMapOptionByIndex = function(index){
             {
                 type: 'value',
                 name: 'Acos(%)',
-                min: DATA.FAKE.KEYWORD_DATA[index].threshold[3].min,
-                max: DATA.FAKE.KEYWORD_DATA[index].threshold[3].max,
+                min: mapData.threshold[3].min,
+                max: mapData.threshold[3].max,
                 position: 'right',
                 offset: 80,
                 axisLine: {
@@ -555,32 +677,46 @@ var getMapOptionByIndex = function(index){
                 "name":CONFIG.NAME[0],
                 "type":"bar",
                 "yAxisIndex":0,
-                "data":DATA.FAKE.KEYWORD_DATA[index].impression,
+                "data":impressArr,
                 "itemStyle":ITEM_STYLE_1
             },
             {
                 "name":CONFIG.NAME[1],
                 "type":"bar",
                 "yAxisIndex":1,
-                "data":DATA.FAKE.KEYWORD_DATA[index].bid,
+                "data":bidArr,
                 "itemStyle":ITEM_STYLE_4
             },
             {
                 "name":CONFIG.NAME[2],
                 "yAxisIndex":2,
                 "type":"line",
-                "data":DATA.FAKE.KEYWORD_DATA[index].rank,
+                "data":rankArr,
                 "itemStyle":ITEM_STYLE_2
             },
             {
                 "name":CONFIG.NAME[3],
                 "yAxisIndex":3,
                 "type":"line",
-                "data":DATA.FAKE.KEYWORD_DATA[index].Acos,
+                "data":AcosArr,
                 "itemStyle":ITEM_STYLE_3
+            }
+        ],
+        dataZoom: [
+        	{
+                show: true,
+                start: zoomStart,
+                end: 100
+            },
+            {
+                type: 'inside',
+                start: 0,
+                end: 100
             }
         ]
     };
+    console.log(zoomStart)
+    
     return option_block;
 }
 	

@@ -1,30 +1,48 @@
-ï»¿package com.amazon.keyword.controller;
-
-import java.util.List;
+package com.amazon.keyword.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.amazon.common.entity.Keyword;
 import com.amazon.keyword.bo.IKeywordBo;
+import com.amazon.keyword.bo.IKeywordDetailBo;
+import com.amazon.keyword.bo.IKeywordRankBo;
 
 @Controller
 @RequestMapping("/keyword/main")
 public class KeywordController {
 	@Resource
 	private IKeywordBo keywordBo;
+	@Resource
+	private IKeywordDetailBo keywordDetailBo;
+	@Resource
+	private IKeywordRankBo keywordRankBo;
 	
 	/**
      * @apiDefine Keyword Keyword
      */
 	
+	@RequestMapping("/nlIctUpdateExcel")
+	@ResponseBody
+	public Object nlIctUpdateExcel(HttpSession session){
+		String rootName = session.getServletContext().getRealPath("");
+		System.out.println(rootName);
+		
+		keywordDetailBo.txInserBatchDetailCSV(rootName);
+		keywordRankBo.txInsertBatchRank(rootName);
+		keywordBo.txUpdateVolume(rootName);
+		return "ok";
+	}
+	
+	
+	
 	/**
-     * @api {get} /keyword/main/nlIctUpdateVolume.do æ›´æ–°æ•°æ®æº
+     * @api {get} /keyword/main/nlIctUpdateVolume.do ¸üĞÂÊı¾İÔ´
      * @apiGroup Keyword
      * @apiSuccessExample Success-Response:
      * {
@@ -33,26 +51,27 @@ public class KeywordController {
      */
 	@RequestMapping("/nlIctUpdateVolume")
 	@ResponseBody
-	public Object nlIctUpdateVolume(){
-		keywordBo.txUpdateVolume();
+	public Object nlIctUpdateVolume(HttpSession session){
+		String rootName = session.getServletContext().getRealPath("");
+		keywordBo.txUpdateVolume(rootName);
 		return "ok";
 	}
 	
 	/**
-     * @api {get} /keyword/main/nlIctQueryAllDataById.do é€šè¿‡idæŸ¥è¯¢
+     * @api {get} /keyword/main/nlIctQueryAllDataById.do Í¨¹ıid²éÑ¯
      * @apiGroup Keyword
-     * @apiParam {String} name å…³é”®è¯åç§°
-     * @apiParam {String} matchType åŒ¹é…è§„åˆ™
-     * @apiParam {long} startTime å¼€å§‹èŒƒå›´
-     * @apiParam {long} endTime ç»“æŸèŒƒå›´
-     * @apiParam {int} groupId åˆ†ç»„id
-     * @apiParam {int} volume æ•°é‡?
-     * @apiParam {int} page é¡µæ•°
-     * @apiParam {int} rows æ¯é¡µçš„æ•°é‡
-     * @apiParam {int} id ä¸»é”®id
+     * @apiParam {String} name ¹Ø¼ü´ÊÃû³Æ
+     * @apiParam {String} matchType Æ¥Åä¹æÔò
+     * @apiParam {long} startTime ¿ªÊ¼·¶Î§
+     * @apiParam {long} endTime ½áÊø·¶Î§
+     * @apiParam {int} groupId ·Ö×éid
+     * @apiParam {int} volume ÊıÁ¿?
+     * @apiParam {int} page Ò³Êı
+     * @apiParam {int} rows Ã¿Ò³µÄÊıÁ¿
+     * @apiParam {int} id Ö÷¼üid
      * @apiParam {int} disableFlag
-     * @apiParam {int[]} ids idçš„æ•°ç»„
-     * @apiParam {int} pageStart å¼€å§‹é¡µç ?
+     * @apiParam {int[]} ids idµÄÊı×é
+     * @apiParam {int} pageStart ¿ªÊ¼Ò³Âë?
      * @apiSuccessExample Success-Request:
      * {
      * 	id:1
@@ -164,27 +183,27 @@ public class KeywordController {
     "endTime": null
 }
      */
-	@RequestMapping("/nlIctQueryAllDataById.do")
+	@RequestMapping("/nlIctQueryAllDataById")
 	@ResponseBody
 	public Object nlIctQueryAllDataById(Keyword keyword){
 		return keywordBo.queryAllDataById(keyword);
 	}
 	
 	/**
-     * @api {get} /keyword/main/nlIctQueryAllDataList.do è·å–å…³é”®è¯åˆ—è¡¨
+     * @api {get} /keyword/main/nlIctQueryAllDataList.do »ñÈ¡¹Ø¼ü´ÊÁĞ±í
      * @apiGroup Keyword
-     * @apiParam {String} name å…³é”®è¯åç§°
-     * @apiParam {String} matchType åŒ¹é…è§„åˆ™
-     * @apiParam {long} startTime å¼€å§‹èŒƒå›´
-     * @apiParam {long} endTime ç»“æŸèŒƒå›´
-     * @apiParam {int} groupId åˆ†ç»„id
-     * @apiParam {int} volume æ•°é‡?
-     * @apiParam {int} page é¡µæ•°
-     * @apiParam {int} rows æ¯é¡µçš„æ•°é‡
-     * @apiParam {int} id ä¸»é”®id
+     * @apiParam {String} name ¹Ø¼ü´ÊÃû³Æ
+     * @apiParam {String} matchType Æ¥Åä¹æÔò
+     * @apiParam {long} startTime ¿ªÊ¼·¶Î§
+     * @apiParam {long} endTime ½áÊø·¶Î§
+     * @apiParam {int} groupId ·Ö×éid
+     * @apiParam {int} volume ÊıÁ¿?
+     * @apiParam {int} page Ò³Êı
+     * @apiParam {int} rows Ã¿Ò³µÄÊıÁ¿
+     * @apiParam {int} id Ö÷¼üid
      * @apiParam {int} disableFlag
-     * @apiParam {int[]} ids idçš„æ•°ç»„
-     * @apiParam {int} pageStart å¼€å§‹é¡µç ?
+     * @apiParam {int[]} ids idµÄÊı×é
+     * @apiParam {int} pageStart ¿ªÊ¼Ò³Âë?
      * @apiSuccessExample Success-Request:
      * {
      * 	startTime:1541692800000
@@ -665,10 +684,10 @@ rows:4
 	}
 	
 	/**
-     * @api {get} /keyword/main/nlIctSetGroupMutiple.do æ‰¹é‡è®¾ç½®åˆ†ç»„
+     * @api {get} /keyword/main/nlIctSetGroupMutiple.do ÅúÁ¿ÉèÖÃ·Ö×é
      * @apiGroup Keyword
-     * @apiParam {int} groupId åˆ†ç»„id
-     * @apiParam {int[]} keyword keywordçš„idæ•°ç»„
+     * @apiParam {int} groupId ·Ö×éid
+     * @apiParam {int[]} keyword keywordµÄidÊı×é
      * @apiSuccessExample Success-Request:
      * {
      * 	groupId:1,
@@ -680,9 +699,9 @@ keywordArr:[1, 2]
      * }
      */
 	/**
-	 * æ‰¹é‡è®¾ç½®group
-	 * @param groupId åˆ†ç»„id
-	 * @param keyword keywordçš„idæ•°ç»„
+	 * ÅúÁ¿ÉèÖÃgroup
+	 * @param groupId ·Ö×éid
+	 * @param keyword keywordµÄidÊı×é
 	 * @return
 	 */
 	@RequestMapping("/nlIctSetGroupMutiple")

@@ -29,8 +29,7 @@ public class KeywordBo implements IKeywordBo{
 	private IKeywordRankDao keywordRankDao;
 
 	@Override
-	public int txUpdateVolume() {
-		String rootName = "F:\\itmsw_work\\amazon";
+	public int txUpdateVolume(String rootName) {
 		File dataDir = new File(rootName + "\\data\\volume");
 		
 		Workbook wb =null;
@@ -78,13 +77,31 @@ public class KeywordBo implements IKeywordBo{
 	public Object queryAllDataById(Keyword keyword) {
 		KeywordDetail keywordDetail = new KeywordDetail();
 		keywordDetail.setKeywordId(keyword.getId());
-		keywordDetail.setStartTime(keyword.getStartTime());
-		keywordDetail.setEndTime(keyword.getEndTime());
+		keywordDetail = keywordDetailDao.queryLatestDetail(keywordDetail);
+		
+		int dayFlag = keyword.getDayFlag();
+		Long startTime = keyword.getStartTime();
+		Long endTime = keyword.getEndTime();
+		Long dayMilliseconds = (long) (24 * 60 * 60 * 1000);
+		
+		if(dayFlag == 1){
+			endTime = keywordDetail.getCreateTime();
+			startTime = endTime - (dayMilliseconds * (7 - 1));
+		}else if(dayFlag == 2){
+			endTime = keywordDetail.getCreateTime();
+			startTime = endTime - (dayMilliseconds * (14 - 1));
+		}else if(dayFlag == 3){
+			endTime = keywordDetail.getCreateTime();
+			startTime = endTime - (dayMilliseconds * (30 - 1));
+		}
+		
+		keywordDetail.setStartTime(startTime);
+		keywordDetail.setEndTime(endTime);
 		
 		KeywordRank keywordRank = new KeywordRank();
 		keywordRank.setKeywordId(keyword.getId());
-		keywordRank.setStartTime(keyword.getStartTime());
-		keywordRank.setEndTime(keyword.getEndTime());
+		keywordRank.setStartTime(startTime);
+		keywordRank.setEndTime(endTime);
 		
 		keyword = keywordDao.selectByPrimaryKey(keyword.getId());
 		keyword.setLatestDetail(keywordDetailDao.queryLatestDetail(keywordDetail));
@@ -100,21 +117,42 @@ public class KeywordBo implements IKeywordBo{
 		KeywordRank keywordRank = null;
 		Keyword existKeyword = null;
 		
+		int dayFlag = keyword.getDayFlag();
+		Long startTime = keyword.getStartTime();
+		Long endTime = keyword.getEndTime();
+		Long dayMilliseconds = (long) (24 * 60 * 60 * 1000);
+		Long diffMilliseconds = null;
+		
+		if(dayFlag == 1){
+			diffMilliseconds = dayMilliseconds * (7 - 1);
+		}else if(dayFlag == 2){
+			diffMilliseconds = dayMilliseconds * (14 - 1);
+		}else if(dayFlag == 3){
+			diffMilliseconds = dayMilliseconds * (30 - 1);
+		}
+		
 		List<Integer> keywordIdList = keywordDao.queryKeywordId(keyword);
 		for(int i = 0;i < keywordIdList.size();i++){
 			existKeyword = keywordDao.selectByPrimaryKey(keywordIdList.get(i));
 			
 			keywordDetail = new KeywordDetail();
 			keywordDetail.setKeywordId(existKeyword.getId());
-			keywordDetail.setStartTime(keyword.getStartTime());
-			keywordDetail.setEndTime(keyword.getEndTime());
+			keywordDetail = keywordDetailDao.queryLatestDetail(keywordDetail);
+			
+			endTime = keywordDetail.getCreateTime();
+			if(dayFlag > 0){
+				startTime = endTime - diffMilliseconds;
+			}
+			
+			keywordDetail.setStartTime(startTime);
+			keywordDetail.setEndTime(endTime);
 			
 			keywordRank = new KeywordRank();
 			keywordRank.setKeywordId(existKeyword.getId());
-			keywordRank.setStartTime(keyword.getStartTime());
-			keywordRank.setEndTime(keyword.getEndTime());
+			keywordRank.setStartTime(startTime);
+			keywordRank.setEndTime(endTime);
 			
-			existKeyword.setLatestDetail(keywordDetailDao.queryLatestDetail(keywordDetail));
+			existKeyword.setLatestDetail(keywordDetail);
 			existKeyword.setDetailList(keywordDetailDao.queryDetailList(keywordDetail));
 			existKeyword.setRankList(keywordRankDao.queryRankList(keywordRank));
 			
@@ -122,7 +160,7 @@ public class KeywordBo implements IKeywordBo{
 		}
 		return keywordList;
 	}
-
+	
 	@Override
 	public int setGruopMutiple(Integer groupId, int[] keywordIdList) {
 		try {
@@ -135,5 +173,4 @@ public class KeywordBo implements IKeywordBo{
 		}
 		return 1;
 	}
-
 }

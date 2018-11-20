@@ -1,6 +1,7 @@
-﻿package com.amazon.keyword.controller;
+package com.amazon.keyword.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,22 +15,11 @@ public class KeywordRankController {
 	@Resource
 	private IKeywordRankBo keywordRankBo;
 	
-	/**
-     * @apiDefine KeywordRank KeywordRank
-     */
-	
-	/**
-     * @api {get} /keyword/rank/nlIctInsertRank.do 更新排名数据源
-     * @apiGroup KeywordRank
-     * @apiSuccessExample Success-Response:
-     * {
-     * 	"ok"
-     * }
-     */
 	@RequestMapping("/nlIctInsertRank")
 	@ResponseBody
-	public Object nlIctInsertDetail(){
-		keywordRankBo.txInsertBatchRank();
+	public Object nlIctInsertDetail(HttpSession session){
+		String rootName = session.getServletContext().getRealPath("");
+		keywordRankBo.txInsertBatchRank(rootName);
 		return "ok";
 	}
 }
