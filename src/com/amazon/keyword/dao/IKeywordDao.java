@@ -17,4 +17,5 @@ public interface IKeywordDao {
     
     List<Integer> queryKeywordId(Keyword record);
 
+    int setGroupById(Integer groupId, Integer id);
 }

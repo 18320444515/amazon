@@ -123,4 +123,17 @@ public class KeywordBo implements IKeywordBo{
 		return keywordList;
 	}
 
+	@Override
+	public int setGruopMutiple(Integer groupId, int[] keywordIdList) {
+		try {
+			for(Integer per : keywordIdList) {
+				keywordDao.setGroupById(groupId, per);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+		return 1;
+	}
+
 }

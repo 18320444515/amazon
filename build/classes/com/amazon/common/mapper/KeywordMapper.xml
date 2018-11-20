@@ -96,4 +96,14 @@
     </where>
     limit #{pageStart,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
   </select>
+  
+  <update id="setGroupById">
+    update keyword
+    <set >
+      <if test="#{0} != null" >
+        group_id = #{0,jdbcType=INTEGER},<!-- 0 = groupId  -->
+      </if>
+    </set>
+    where id = #{1,jdbcType=INTEGER} <!-- 1 = keywordId  -->
+  </update>
 </mapper>
