@@ -1,4 +1,4 @@
-package com.amazon.keyword.controller;
+﻿package com.amazon.keyword.controller;
 
 import javax.annotation.Resource;
 
@@ -14,6 +14,18 @@ public class KeywordRankController {
 	@Resource
 	private IKeywordRankBo keywordRankBo;
 	
+	/**
+     * @apiDefine KeywordRank KeywordRank
+     */
+	
+	/**
+     * @api {get} /keyword/rank/nlIctInsertRank.do 更新排名数据源
+     * @apiGroup KeywordRank
+     * @apiSuccessExample Success-Response:
+     * {
+     * 	"ok"
+     * }
+     */
 	@RequestMapping("/nlIctInsertRank")
 	@ResponseBody
 	public Object nlIctInsertDetail(){

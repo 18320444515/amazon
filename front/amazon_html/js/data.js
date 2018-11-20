@@ -7,7 +7,8 @@
 		"updateVolume": "keyword/main/nlIctUpdateVolume.do",
 		"queryAllData": "keyword/main/nlIctQueryAllDataById.do",
 		"queryDetail": "keyword/detail/nlIctQueryDetail.do",
-		"queryKeywordList": "keyword/main/nlIctQueryAllDataList.do"
+		"queryKeywordList": "keyword/main/nlIctQueryAllDataList.do",
+		"setGruopMutiple": "keyword/main/nlIctSetGroupMutiple.do"
 	}
 	
 	var sendAjax = function(name, params, success){
