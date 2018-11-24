@@ -18,6 +18,7 @@ var CONFIG = {
 /* 专门存放数据 */
 var DATA = {
     /* 用于测试的假数据 */
+   	ASIN: [{"id": 1, "name": "lunch"}, {"id": 2, "name": "baby"}],
     FAKE: {
         CurrentIndex: 0,
         KEYWORD_NAME: ['hello'],
@@ -114,7 +115,6 @@ var getSingleChartData = function(totalData, dayObj){
 	var latestDetail = totalData.latestDetail;
 //	console.log(totalData)
 //  var now = Date.parse(new Date());
-    
     var temp = {
     	threshold: [],
     	type: [],
@@ -134,8 +134,11 @@ var getSingleChartData = function(totalData, dayObj){
 	    sbidHigh: 0,
 	    name: totalData.name,
 	    volume: totalData.volume,
-	    matchType: totalData.matchType
+	    matchType: totalData.matchType,
+	    groupName: totalData.groupName
     };
+    if(!temp.groupName) temp.groupName = "无";
+    
     if(latestDetail){
     	temp.sbidLow = latestDetail.sbidLow;
     	temp.sbidMedian = latestDetail.sbidMedian;
@@ -223,7 +226,10 @@ var getSingleChartData = function(totalData, dayObj){
 	var AcosArr = thresholdArr[3];
 	
 	var totalBid = parseFloat(new Number((totalObj.bid / totalObj.time)).toFixed(2));
-	var totalAcos = parseFloat(new Number((totalObj.Acos / totalObj.time)).toFixed(2));
+	var totalAcos = 0;
+	if(totalObj.sales > 0){
+		totalAcos = parseFloat(new Number((totalObj.spend / totalObj.sales * 100)).toFixed(2));
+	}
 	
 	temp.type.push(2);
 	temp.type.push(0);
@@ -334,7 +340,7 @@ function formatData(totalData, dayObj){
 	}else if(dayFlag == 3){
 		days = 30
 	}
-	console.log(dayFlag)
+//	console.log(dayFlag)
 	
 	for(var d = 1;d < days;d++){
 		timeStamp = endTime - (dayMs * d);
@@ -393,6 +399,8 @@ function getThreshold(arr, type){
 	}else if(type == 2){
 		min -= diff * 0.6;
 		max += diff;
+		if(isNaN(min)) min = 0;
+		if(isNaN(max)) max = 100;
 	}else if(type == 3){
 		max += 20;
 		min -= 80;
@@ -401,7 +409,10 @@ function getThreshold(arr, type){
 	}
 	
 	var threshold = {"max": Math.floor(max), "min": Math.floor(min)};
+	
+//	console.log(type + "--" + arr)
 //	console.log(threshold);
+//	console.log("------")
 	return threshold;
 }
 
@@ -424,7 +435,7 @@ var ITEM_STYLE_1 = {
         label: {
             show: true, 
             position: 'top',
-            offset: [0, -5],
+            offset: [0, 0],
             align: 'center',
             formatter:"{c}"
         }
@@ -467,9 +478,9 @@ var ITEM_STYLE_2 = {
             		var diffRank = lastRank - firstRank;
 //          		console.log(firstRank + "--" + lastRank)
             		if(diffRank > 0){
-            			rt = "+" + diffRank;
+            			rt = "-" + diffRank;
             		}else{
-            			rt = diffRank;
+            			rt = "+" + Math.abs(diffRank);
             		}
             		
             	}else{
@@ -509,7 +520,7 @@ var ITEM_STYLE_3 = {
                 	index = DATA.FAKE.KEYWORD_DATA[p].Acos.length - 1;
                 	order = DATA.FAKE.KEYWORD_DATA[p].order[index];
                 }
-                console.log(index)
+//              console.log(index)
             	
             	var rt = "";
 //          	console.log('p = '+p+"\nparams = "+params);
@@ -557,7 +568,7 @@ var getMapOptionByIndex = function(index, totalFlag){
 		rankArr = rankArr.slice(-1);
 		AcosArr = AcosArr.slice(-1);
 	}
-	console.log(impressArr)
+//	console.log(impressArr)
 	
     var option_block = {
         /* 全局调色 */
@@ -715,7 +726,7 @@ var getMapOptionByIndex = function(index, totalFlag){
             }
         ]
     };
-    console.log(zoomStart)
+//  console.log(zoomStart)
     
     return option_block;
 }

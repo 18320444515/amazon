@@ -35,7 +35,7 @@ public class LoadDataUtil {
 			    csvList.add(reader.getValues()); //按行读取，并把每一行的数据添加到list集合
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
         reader.close();
@@ -142,12 +142,35 @@ public class LoadDataUtil {
     }
     
     public static Date getFormatDate(String strDate){
-    	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+//    	System.out.println(strDate);
+    	String[] timeArr = strDate.split(" ");
+    	String dateStr = timeArr[0];
+    	String timeStr = timeArr[1];
+//    	System.out.println(dateStr);
+    	
+    	
+    	timeArr = timeStr.split(":");
+//    	System.out.println(Arrays.toString(timeArr));
+    	String formatStr = null;
+    	
+//    	System.out.println(dateStr);
+    	if(dateStr.indexOf("-") > -1){
+    		formatStr = "yyyy-MM-dd";
+    	}else if(dateStr.indexOf("/") > -1){
+    		formatStr = "yyyy/MM/dd";
+    	}
+    	if(timeArr.length == 2){
+    		formatStr += " HH:mm";
+    	}else if(timeArr.length == 3){
+    		formatStr += " HH:mm:ss";
+    	}
+    	
+    	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatStr);
     	Date date = null;
     	try {
     		date = simpleDateFormat.parse(strDate);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		return date;
@@ -162,8 +185,9 @@ public class LoadDataUtil {
     	return "error";
     }
     
-    public static boolean canFileUse(String fileName){
-    	if(fileName.indexOf("OK_") == 0) return false;
+    public static boolean canFileUse(File file){
+    	if(file.isDirectory()) return false;
+    	if(file.getName().indexOf("OK_") == 0) return false;
 		return true;
     }
     
@@ -189,7 +213,7 @@ public class LoadDataUtil {
     }
 	
 	public static void main(String[] args) {
-//		System.out.println(getFormatDate("2018/11/9 1:11:00"));
+		System.out.println(getFormatDate("2018/11/1 9:28"));
 		
 		
 		String rootName = System.getProperty("user.dir");
@@ -198,7 +222,7 @@ public class LoadDataUtil {
 		String fileName = rootName + "\\data\\keyword\\" + "ADGROUP_KEYWORDS_11_  -11_  -2018.csv";
 //		File file = new File(fileName);
 		
-		importCSVFile(fileName);
+//		importCSVFile(fileName);
 //		File dataDir = new File(rootName + "\\" + "data\\keyword");
 //		File[] files = dataDir.listFiles();
 //		for (File file : files) {

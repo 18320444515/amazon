@@ -17,7 +17,7 @@ public class BaseEntity implements Serializable{
 
 	public BaseEntity() {
 		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public Integer getId() {

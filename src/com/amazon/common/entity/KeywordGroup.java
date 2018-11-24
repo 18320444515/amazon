@@ -4,9 +4,11 @@ import java.io.Serializable;
 
 public class KeywordGroup extends BaseEntity implements Serializable{
     private Integer id;
+    
+    private Integer asinId;
 
     private String name;
-
+    
     public Integer getId() {
         return id;
     }
@@ -22,4 +24,12 @@ public class KeywordGroup extends BaseEntity implements Serializable{
     public void setName(String name) {
         this.name = name;
     }
+
+	public Integer getAsinId() {
+		return asinId;
+	}
+
+	public void setAsinId(Integer asinId) {
+		this.asinId = asinId;
+	}
 }

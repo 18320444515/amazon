@@ -14,8 +14,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 
 import com.amazon.common.entity.Keyword;
+import com.amazon.common.entity.KeywordAsin;
 import com.amazon.common.entity.KeywordDetail;
 import com.amazon.common.util.LoadDataUtil;
+import com.amazon.keyword.dao.IKeywordAsinDao;
 import com.amazon.keyword.dao.IKeywordDao;
 import com.amazon.keyword.dao.IKeywordDetailDao;
 import com.csvreader.CsvReader;
@@ -26,6 +28,8 @@ public class KeywordDetailBo implements IKeywordDetailBo{
 	private IKeywordDao keywordDao;
 	@Resource
 	private IKeywordDetailDao keywordDetailDao;
+	@Resource
+	private IKeywordAsinDao keywordAsinDao;
 	
 	@Override
 	public Object queryDetailList(KeywordDetail keywordDetail) {
@@ -35,7 +39,7 @@ public class KeywordDetailBo implements IKeywordDetailBo{
 	@Override
 	public int txInserBatchDetailCSV(String rootName) {
 		File dataDir = new File(rootName + "\\data\\keyword");
-		System.out.println(dataDir.getAbsolutePath());
+//		System.out.println(dataDir.getAbsolutePath());
 		
 		CsvReader reader = null;
 		ArrayList<String[]> csvList = null;
@@ -46,70 +50,92 @@ public class KeywordDetailBo implements IKeywordDetailBo{
 		KeywordDetail keywordDetail = new KeywordDetail();
 		Integer keywordId = null;
 		Date fileDate = null;
+		KeywordAsin keywordAsin = null;
+		KeywordAsin existKeywordAsin = null;
+		Integer keywordAsinId = null;
 		
 		File[] files = dataDir.listFiles();
+		File[] subFiles = null;
+		
         for (File file : files) {
-			if(file.isDirectory()) continue;
-			if(!LoadDataUtil.canFileUse(file.getName())) continue;
+			if(!file.isDirectory()) continue;
+			System.out.println(file.getName());
 			
-			fileDate = LoadDataUtil.getFileNameDate(file.getName());
-			if(fileDate == null) continue;
+			keywordAsin = new KeywordAsin();
+			keywordAsin.setName(file.getName());
+			existKeywordAsin = keywordAsinDao.selectKeywordAsin(keywordAsin);
+        	if(existKeywordAsin == null){
+        		keywordAsinDao.insertSelective(keywordAsin);
+        		keywordAsinId = keywordAsin.getId();
+        	}else{
+        		keywordAsinId = existKeywordAsin.getId();
+        	}
 			
-			try {
-	        	csvList = new ArrayList<String[]>(); 
-	        	reader = new CsvReader(file.getAbsolutePath(), ',', Charset.forName("GBK"));
-				while(reader.readRecord()){
-//					System.out.println(reader.getValues());
-				    csvList.add(reader.getValues()); //按行读取，并把每一行的数据添加到list集合
+			
+			subFiles = file.listFiles();
+			for(File sFile : subFiles){
+				if(!LoadDataUtil.canFileUse(sFile)) continue;
+				
+				fileDate = LoadDataUtil.getFileNameDate(sFile.getName());
+				if(fileDate == null) continue;
+				
+				try {
+		        	csvList = new ArrayList<String[]>(); 
+		        	reader = new CsvReader(sFile.getAbsolutePath(), ',', Charset.forName("GBK"));
+					while(reader.readRecord()){
+//						System.out.println(reader.getValues());
+					    csvList.add(reader.getValues()); //按行读取，并把每一行的数据添加到list集合
+					}
+				} catch (IOException e) {
+					
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		        reader.close();
+		        
+		        if("error".equals(LoadDataUtil.changeFileName(sFile, "OK_" + sFile.getName()))) continue;
+		        
+		        
+		        for(int row = 1;row < csvList.size();row++){
+		        	itemArr = csvList.get(row);
+		        	
+//		        	System.out.println(itemArr);
+		        	
+		        	keyword = new Keyword();
+		        	keyword.setName(itemArr[1]);
+		        	keyword.setMatchType(itemArr[2]);
+		        	existKeyword = keywordDao.selectKeyword(keyword);
+		        	if(existKeyword == null){
+		        		keyword.setId(null);
+		        		keyword.setAsinId(keywordAsinId);
+		        		keywordDao.insertSelective(keyword);
+		        		keywordId = keyword.getId();
+		        	}else{
+		        		keywordId = existKeyword.getId();
+		        	}
+		        	
+		        	keywordDetail.setKeywordId(keywordId);
+//		        	System.out.println("--" + itemArr[4]);
+		        	if("".equals(itemArr[4])) itemArr[4] = "0";
+		        	keywordDetail.setSbidLow(Float.parseFloat(itemArr[4]));
+		        	if("".equals(itemArr[5])) itemArr[5] = "0";
+		        	keywordDetail.setSbidMedian(Float.parseFloat(itemArr[5]));
+		        	if("".equals(itemArr[6])) itemArr[6] = "0";
+		        	keywordDetail.setSbidHigh(Float.parseFloat(itemArr[6]));
+		        	keywordDetail.setKeywordBid(Float.parseFloat(itemArr[7]));
+		        	keywordDetail.setImpression(Integer.parseInt(itemArr[8]));
+		        	keywordDetail.setSpend(Float.parseFloat(itemArr[11]));
+		        	keywordDetail.setCpc(Float.parseFloat(itemArr[12]));
+		        	keywordDetail.setOrders(Integer.parseInt(itemArr[13]));
+		        	keywordDetail.setSales(Float.parseFloat(itemArr[14]));
+		        	keywordDetail.setCreateTime(fileDate.getTime());
+//		        	keywordDetail.setMatchType(itemArr[2]);
+		        	if("".equals(itemArr[15])) itemArr[15] = "0";
+		        	keywordDetail.setAcos(Float.parseFloat(itemArr[15]));
+//		        	
+		        	keywordDetailDao.insertSelective(keywordDetail);
+		        	
+		        }
 			}
-	        reader.close();
-	        
-	        if("error".equals(LoadDataUtil.changeFileName(file, "OK_" + file.getName()))) continue;
-	        
-	        
-	        for(int row = 1;row < csvList.size();row++){
-	        	itemArr = csvList.get(row);
-	        	
-//	        	System.out.println(itemArr);
-	        	
-	        	keyword = new Keyword();
-	        	keyword.setName(itemArr[1]);
-	        	keyword.setMatchType(itemArr[2]);
-	        	existKeyword = keywordDao.selectKeyword(keyword);
-	        	if(existKeyword == null){
-	        		keyword.setId(null);
-	        		keywordDao.insertSelective(keyword);
-	        		keywordId = keyword.getId();
-	        	}else{
-	        		keywordId = existKeyword.getId();
-	        	}
-	        	
-	        	keywordDetail.setKeywordId(keywordId);
-//	        	System.out.println("--" + itemArr[4]);
-	        	if("".equals(itemArr[4])) itemArr[4] = "0";
-	        	keywordDetail.setSbidLow(Float.parseFloat(itemArr[4]));
-	        	if("".equals(itemArr[5])) itemArr[5] = "0";
-	        	keywordDetail.setSbidMedian(Float.parseFloat(itemArr[5]));
-	        	if("".equals(itemArr[6])) itemArr[6] = "0";
-	        	keywordDetail.setSbidHigh(Float.parseFloat(itemArr[6]));
-	        	keywordDetail.setKeywordBid(Float.parseFloat(itemArr[7]));
-	        	keywordDetail.setImpression(Integer.parseInt(itemArr[8]));
-	        	keywordDetail.setSpend(Float.parseFloat(itemArr[11]));
-	        	keywordDetail.setCpc(Float.parseFloat(itemArr[12]));
-	        	keywordDetail.setOrders(Integer.parseInt(itemArr[13]));
-	        	keywordDetail.setSales(Float.parseFloat(itemArr[14]));
-	        	keywordDetail.setCreateTime(fileDate.getTime());
-//	        	keywordDetail.setMatchType(itemArr[2]);
-	        	if("".equals(itemArr[15])) itemArr[15] = "0";
-	        	keywordDetail.setAcos(Float.parseFloat(itemArr[15]));
-//	        	
-	        	keywordDetailDao.insertSelective(keywordDetail);
-	        	
-	        }
         }
         
 		return 0;
@@ -132,7 +158,7 @@ public class KeywordDetailBo implements IKeywordDetailBo{
         File[] files = dataDir.listFiles();
         for (File file : files) {
 			if(file.isDirectory()) continue;
-			if(!LoadDataUtil.canFileUse(file.getName())) continue;
+			if(!LoadDataUtil.canFileUse(file)) continue;
 			
 			wb = LoadDataUtil.readExcel(file.getAbsolutePath());
 	        if(wb != null){

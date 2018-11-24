@@ -114,7 +114,8 @@
 	padding: 20px 0;
 	text-align: center;
 	font-size: 16px;
-	background-color: #F5F5F5;
+	background-color: #232323;
+	color: #fff;
 	cursor: pointer;
 	margin-bottom: 30px;
 }
@@ -128,4 +129,75 @@
 #total_button.active{
 	background-color: #f04124;
 	color: #fff;
+}
+#delete_button{
+	padding: 10px 20px;
+	border-radius:5px;
+	background-color: #000;
+	color: #fff;
+	margin-right: 10px;
+}
+.all{
+	padding-left: 140px;
+}
+.asin-box{
+	position: fixed;
+	left: 20px;
+	top: 62px;
+	width: 120px;
+	text-align: center;
+}
+.asin-box>.asin-list{
+	position: relative;
+}
+.asin-btn{
+	position: relative;
+	margin: 20px 0;
+	border: 1px solid #cecece;
+	padding: 8px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.asin-btn.active{
+	background-color: #379230;
+	color: #fff;
+}
+.group-box{
+	position: relative;
+	text-align: center;
+	margin-top: 15px;
+}
+.group-box>.group-value{
+	position: relative;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	cursor: pointer;
+	user-select: none;
+}
+.group-box>.group-list{
+	position: relative;
+	margin: 0;
+	margin-top: 4px;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	list-style:none;
+	display: none;
+}
+.group-list.active{
+	display: block;
+}
+.group-list>li{
+	position: relative;
+	padding: 3px 0;
+	border-bottom: 1px solid #aaa;
+	cursor: pointer;
+}
+.group-list>li:last-child{
+	border-bottom: none;
+}
+.no-select{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -ms-user-select: none;
 }

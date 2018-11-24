@@ -16,6 +16,7 @@ public interface IKeywordDao {
     Keyword selectKeyword(Keyword record);
     
     List<Integer> queryKeywordId(Keyword record);
+    
+    void deleteAllRecord();
 
-    int setGroupById(Integer groupId, Integer id);
 }

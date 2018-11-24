@@ -3,10 +3,11 @@
 <mapper namespace="com.amazon.keyword.dao.IKeywordGroupDao" >
   <resultMap id="BaseResultMap" type="com.amazon.common.entity.KeywordGroup" >
     <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="asin_id" property="asinId" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name
+    id, asin_id, name
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -18,11 +19,14 @@
     delete from keyword_group
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insertSelective" parameterType="com.amazon.common.entity.KeywordGroup" >
+  <insert id="insertSelective" parameterType="com.amazon.common.entity.KeywordGroup" useGeneratedKeys="true" keyProperty="id">
     insert into keyword_group
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
+      </if>
+      <if test="asinId != null" >
+        asin_id,
       </if>
       <if test="name != null" >
         name,
@@ -32,6 +36,9 @@
       <if test="id != null" >
         #{id,jdbcType=INTEGER},
       </if>
+      <if test="asinId != null" >
+        #{asinId,jdbcType=INTEGER},
+      </if>
       <if test="name != null" >
         #{name,jdbcType=VARCHAR},
       </if>
@@ -40,6 +47,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.amazon.common.entity.KeywordGroup" >
     update keyword_group
     <set >
+   	  <if test="asinId != null" >
+        #{asinId,jdbcType=INTEGER},
+      </if>
       <if test="name != null" >
         name = #{name,jdbcType=VARCHAR},
       </if>

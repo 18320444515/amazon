@@ -12,6 +12,8 @@ public class Keyword extends BaseEntity implements Serializable{
 
     private Integer groupId;
     
+	private Integer asinId;
+    
     private String matchType;
     
     private KeywordDetail latestDetail;
@@ -25,6 +27,8 @@ public class Keyword extends BaseEntity implements Serializable{
     private Long endTime;
     
     private Integer dayFlag;
+    
+    private String groupName;
 
     public Integer getId() {
         return id;
@@ -112,5 +116,21 @@ public class Keyword extends BaseEntity implements Serializable{
 
 	public void setDayFlag(Integer dayFlag) {
 		this.dayFlag = dayFlag;
+	}
+	
+	public Integer getAsinId() {
+		return asinId;
+	}
+
+	public void setAsinId(Integer asinId) {
+		this.asinId = asinId;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 }

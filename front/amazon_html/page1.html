@@ -15,30 +15,7 @@
   <script type="text/javascript" src="./js/static/echarts.min.js"></script>
 </head>
 <body>
-
-<div class="fixed">
-  <nav class="top-bar" data-topbar>
-    <ul class="title-area">
-      <li class="name">
-        <!-- 如果你不需要标题或图标可以删掉它 -->
-        <h1><a href="#">OBOO</a></h1>
-      </li>
-        <!-- 小屏幕上折叠按钮: 去掉 .menu-icon 类，可以去除图标。 
-        如果需要只显示图片，可以删除 "Menu" 文本 -->
-      <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-    </ul>
-
-    <section class="top-bar-section">
-      <ul class="left">
-        <li><a href="./index.html">Home</a></li>
-        <li class="active"><a href="#">Page 1</a></li>
-        <li><a href="#">Page 2</a></li>
-        <li><a href="./test.html">Test</a></li> 
-      </ul>
-    </section>
-  </nav>
-</div>
-
+  
 <div class="hidden_div" style="width: 100%;height: 100%;display: none;">
   <div id="shadow" style="background-color: rgba(0,0,0,0.59);width: 100%;height: 100%;z-index: 99;display: flex;">
     <p> </p>
@@ -119,17 +96,50 @@
 </div>
 
 <div class="all primary-text-color">
-
+		<div class="fixed">
+		  <nav class="top-bar" data-topbar>
+		    <ul class="title-area">
+		      <li class="name">
+		        <!-- 如果你不需要标题或图标可以删掉它 -->
+		        <h1><a href="javascript:void(0);" @click="addGroup">添加分组</a></h1>
+		        <!--<h2 style="display: inline-block;"><a href="javascript:void(0);" @click="addGroup">添加分组</a></h2>-->
+		      </li>
+		        <!-- 小屏幕上折叠按钮: 去掉 .menu-icon 类，可以去除图标。 
+		        如果需要只显示图片，可以删除 "Menu" 文本 -->
+		      <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+		    </ul>
+		    <section class="top-bar-section">
+		      <ul class="left">
+		      	<li class="active" @click="changeGroup" groupId="0"><a href="javascript:void(0);" >全部</a></li>
+		      	<li  @click="changeGroup" :groupId="per.id" v-for="(per,index) in group_items">
+		      		<a href="javascript:void(0);" >{{per.name}}</a>
+		      	</li>
+		        <!--<li><a href="./index.html">Home</a></li>
+		        <li class="active"><a href="#">Page 1</a></li>
+		        <li><a href="#">Page 2</a></li>
+		        <li><a href="#">Page 3</a></li> -->
+		      </ul>
+		    </section>
+		  </nav>
+		</div>
+	
+		<div class="asin-box">
+			<span class="filter-title">Asin</span>
+			<div class="asin-list">
+				<div class="asin-btn" :asinIndex="index" :class="(index == 0)? 'active' : ''" v-for="(per,index) in asin_items" @click="changeAsin">{{per.name}}</div>
+			</div>
+		</div>
     <div class="main">
-
       <div class="filter">
       	<span class="filter-title">Keywords</span>
+      	<button id="delete_button" @click="deleteAll">清空</button>
         <button id="filter_button" style="padding: 10px 20px;border-radius:5px;background-color: #FFC107;margin-right: 10px">筛选</button>
-        <button id="excel_button" style="padding: 10px 20px;border-radius:5px;background-color: #328BC7;margin-right: 10px">录入</button>
-        <button id="total_button">total</button>
+        <button id="excel_button" @click="updateExcel" style="padding: 10px 20px;border-radius:5px;background-color: #328BC7;margin-right: 10px">录入</button>
+        <button id="total_button" @click="totalClick">total</button>
+        <button id="delete_group_button" @click="deleteGroup" class="danger" v-if="group_id != null">删除该分组</button>
       </div>
 
-      <div class="map" :mapid="index" v-for="(per,index) in map_names">
+      <div class="map" :mapid="index" v-for="(per,index) in map_names" >
 
         <!-- TODO 从这里开始有改动 -->
         <div class="map_head">
@@ -138,6 +148,14 @@
               <br>({{map_items[index].matchType}})
               <br> volume: {{map_items[index].volume}} 
               <br> Suggested bid: <span style="display: block;margin-left: 20px;margin-top: 5px;">{{map_items[index].sbidLow}}<br>{{map_items[index].sbidMedian}}<br>{{map_items[index].sbidHigh}}</span></h6>
+          	<div class="group-box">
+          		<div style="text-align: left;font-weight: bold;">分组:</div>
+          		<div class="group-value no-select" @click="chooseGroup">{{map_items[index].groupName}}</div>
+          		<ul class="group-list no-select">
+          			<li @click="confirmGroup" groupId="0">无</li>
+          			<li @click="confirmGroup" :groupId="per.id" v-for="(per,index) in group_items">{{per.name}}</li>
+          		</ul>
+          	</div>
           </div>
           <div class="map_else" style="width: 80%;margin-left: 10px;">
             <div class="map_button">

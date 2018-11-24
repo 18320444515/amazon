@@ -2,61 +2,235 @@
 // console.log("The original data is: "+CONFIG.COLOR);
 
 /* 注意，在使用result对象的时候不需要写data，直接写result.map_items即可获取到map_items的内容 */
-var result = null;
-console.log(result)
+var vm = null;
+console.log(vm)
 
 var df = {
 	"page": 1,
-	"rows": 4,
-	"totalFlag": false
+	"rows": 30,
+	"totalFlag": false,
+	"refreshFlag": false,
+	"asinIndex": 0,
+	"groupId": null
 }
-/* 解释： */
-var refresh = function(){
+
+var initDom = function(){
+	/** jQuery效果 **/
+	$(document).ready(function(){
+//		console.log($("#total_button"))
+	
+		$('#filter_button').click(function(){
+			// $('.hidden_div').attr('style','display:block');
+			$('.hidden_div').show();
+			console.log("Dsds")
+		});
+	
+		$('.map').hover(function(){
+			DATA.FAKE.CurrentIndex = $(this).attr("mapid");
+		});
+
+		$('#shadow').click(function(){
+			$('.hidden_div').hide();
+		});
+		
+		$("#excel_button").click(function(){
+			updateExcel();
+		});
+		
+		$("#total_button").click(function(){
+			console.log("dsd")
+			if(df.totalFlag){
+				df.totalFlag = false;
+				$(this).removeClass("active");
+			}else{
+				df.totalFlag = true;
+				$(this).addClass("active");
+			}
+			updateChart();
+		});
+		
+		$("#delete_button").click(function(){
+			if(confirm('确定要删除全部数据吗'))
+			ajaxObj.sendAjax("deleteAllData", null, function(data){
+        		if(data == "ok"){ 
+        			alert("删除成功！");
+        			window.location.reload();
+        		}
+		  	});
+		});
+		
+//		$('.more-btn').click(function(){
+//			addPageData()
+//		});
+		
+	})
+}
+
+var initVue = function(){
+	if(!vm){
+		vm = new Vue({
+		    el:'.all',
+		    data: {
+		    	asin_items: DATA.ASIN,
+		    	group_items: DATA.ASIN[df.asinIndex].groupList,
+		    	map_names:DATA.FAKE.KEYWORD_NAME,
+		        map_items:DATA.FAKE.KEYWORD_DATA,
+		        group_id: df.groupId
+		    },
+		    methods: {
+	            "updateChart": _.debounce(e => {
+	            	var $this = $(e.target);
+	            	if($this.hasClass("no-more")) return;
+	            	console.log($this);
+	            	addPageData();
+	            }, 1000),
+	            "changeAsin": e => {
+	            	var $this = $(e.target);
+	            	df.asinIndex = $this.attr("asinIndex");
+	            	df.groupId = null;
+	            	vm.group_id = df.groupId;
+	            	$(".top-bar-section>ul>li").eq(0).addClass("active").siblings().removeClass("active");
+	            	
+	            	vm.group_items = DATA.ASIN[df.asinIndex].groupList
+	            	
+	            	$this.addClass("active").siblings().removeClass("active");
+	            	addPageData(true);
+	            },
+	            "updateExcel": function(){
+	            	updateExcel();
+	            },
+	            "totalClick": e => {
+	            	var $this = $(e.target);
+	            	if(df.totalFlag){
+						df.totalFlag = false;
+						$this.removeClass("active");
+					}else{
+						df.totalFlag = true;
+						$this.addClass("active");
+					}
+					updateChart();
+	            },
+	            "deleteAll": function(){
+	            	
+	            },
+	            "deleteGroup": function(){
+	            	if(confirm('确定要此分组吗？'))
+	            	ajaxObj.sendAjax("deleteGroup", {"id":df.groupId}, function(data){
+	            		if(data == "ok"){ 
+		        			alert("删除成功！");
+		        			window.location.reload();
+		        		}
+				  	});
+	            },
+	            "addGroup": function(){
+//	            	alert("添加分组")
+	            	var name = prompt("请输入新的分组名字","");
+	            	if (name != null && name != ""){
+	            		// 添加分组API
+	            		ajaxObj.sendAjax("insertGroup", {"asinId":vm.asin_items[df.asinIndex].id,"name": name}, function(data){
+			        		if(data != 0) {
+			        			alert("添加分组成功");
+			        			window.location.reload();
+				        		// 设置分组到页面
+				        		// vm.group_items.push({"id": data, "name": name});
+			        		}else{
+			        			alert("添加分组失败");
+			            	}
+					  	});
+	            	}
+	            },
+	            "changeGroup": e => {
+	            	var $this = $(e.target).parent();
+	            	console.log($this)
+	            	df.groupId = $this.attr("groupId");
+	            	if(df.groupId == 0) {
+	            		df.groupId = null;
+	            		vm.group_id = df.groupId;
+	            	}else{
+	            		vm.group_id = df.groupId;
+	            	}
+//	            	console.log(df.groupId)
+	            	
+	            	$this.addClass("active").siblings().removeClass("active");
+	            	addPageData(true);
+	            },
+	            "chooseGroup": e => {
+	            	console.log("choose");
+	            	$(e.target).siblings(".group-list").toggleClass("active");
+	            },
+	            "confirmGroup": e => {
+	            	var $this = $(e.target);
+	            	var $parent = $this.parent();
+	            	
+	            	var id = DATA.FAKE.KEYWORD_NAME[DATA.FAKE.CurrentIndex];
+	            	var groupid = $this.attr("groupid");
+	            	console.log("id: "+id+", confirm "+groupid);
+	            	$parent.siblings(".group-value").html($this.html());
+	            	$parent.removeClass("active");
+
+	      //       	改变分组
+	            	ajaxObj.sendAjax("changeGroup", {"id":id, "groupId":groupid}, function(data){
+	            		// console.log(data);
+				  	});
+	            }
+	        }
+		});
+	}
+}
+
+var initChart = function(){
+	initVue();
+	df.page = 1;
+	updateChart();
+}
+
+var addPageData = function(refresh){
+	if(refresh){
+		df.page = 1;
+		$(".more-btn").removeClass("no-more").html("加载更多");
+		$("body").scrollTop(0);
+	}else{
+		df.page++;
+	}
+	var asinId = DATA.ASIN[df.asinIndex].id;
+	if (df.groupId==0) {
+		var groupId = null;
+	}else{
+		var groupId = df.groupId;
+	}
+	
 	var params = {
 		"dayFlag": 1,
 		"page": df.page,
-		"rows": df.rows
+		"rows": df.rows,
+		"asinId": asinId
 	}
-////	console.log(Date.parse(new Date(2018, 11-1, 10)) + "--" + Date.parse(new Date(2018, 11-1, 11)))
+	if(groupId) params.groupId = groupId;
 	ajaxObj.sendAjax("queryKeywordList", params, function(data){
-//  	console.log(data)
-    	getTotalChartData(data, true);
-//  	getChartData(data);
-    	
-    	/** jQuery效果 **/
-    	$(document).ready(function(){
-		
-			$('#filter_button').click(function(){
-				// $('.hidden_div').attr('style','display:block');
-				$('.hidden_div').show();
-				console.log("Dsds")
-			});
-		
-			$('#shadow').click(function(){
-				$('.hidden_div').hide();
-			});
-			
-			$("#excel_button").click(function(){
-				updateExcel();
-			});
-			
-			$("#total_button").click(function(){
-				if(df.totalFlag){
-					df.totalFlag = false;
-					$(this).removeClass("active");
-				}else{
-					df.totalFlag = true;
-					$(this).addClass("active");
-				}
-				updateChart();
-			});
-			
-			$('.more-btn').click(function(){
-				addPageData()
-			});
-			
-		})
-    })
+//		console.log(data)
+    	getTotalChartData(data, refresh);
+  	});
+}
+
+var addAsinData = function(){
+	ajaxObj.sendAjax("queryAsinList", null, function(data){
+		// console.log(data)
+		if(data.length > 0){
+			DATA.ASIN = [];
+			for(var d in data){
+				DATA.ASIN.push(data[d]);
+			}
+			addPageData(true);
+		}
+		initDom();
+//  	getTotalChartData(data, refresh);
+  	});
+}
+
+/* 解释： */
+var refresh = function(){
+	addAsinData();
+//	addPageData(true);
 }
 
 refresh();
@@ -79,14 +253,20 @@ var updateExcel = function(){
  * @param {Object} totalList
  */
 var getTotalChartData = function(totalList, refresh){
-	if(totalList.length == 0){
-		$(".more-btn").html("没有更多了");
-		return false;
+	if(totalList.length < df.rows){
+		$(".more-btn").addClass("no-more").html("没有更多了");
 	}
+	
 	if(refresh){
 		DATA.FAKE.KEYWORD_NAME = [];
 		DATA.FAKE.KEYWORD_DATA = [];
 	    DATA.FAKE.CurrentIndex = 0;
+	}
+	
+	if(totalList.length == 0){
+		vm.map_names = DATA.FAKE.KEYWORD_NAME;
+    	vm.map_items = DATA.FAKE.KEYWORD_DATA;
+		return false;
 	}
 	
     var totalData = null;
@@ -100,24 +280,10 @@ var getTotalChartData = function(totalList, refresh){
     }
     
     if(refresh){
-    	initChart(df.page);
+    	initChart();
     }else{
     	updateChart(df.page);
     }
-}
-
-var addPageData = function(){
-	df.page++;
-	var params = {
-		"dayFlag": 1,
-		"page": df.page,
-		"rows": df.rows
-	}
-	ajaxObj.sendAjax("queryKeywordList", params, function(data){
-		console.log(data)
-    	getTotalChartData(data);
-    	updateChart(df.page);
-  	});
 }
 
 var refreshSingleData = function(dayFlag){
@@ -177,25 +343,12 @@ var updateSingleChart = function(totalData, dayObj){
 	temp.setOption(getMapOptionByIndex(index, df.totalFlag));
 }
 
-var initChart = function(page){
-	if(result) returns; 
-	result = new Vue({
-	    el:'.main',
-	    data: {
-	    	map_names:DATA.FAKE.KEYWORD_NAME,
-	        map_items:DATA.FAKE.KEYWORD_DATA
-	    },
-	    methods: {
-            "updateChart": _.debounce(function(){
-                updateChart(df.page)
-            }, 1000)
-        }
-	});
-	updateChart(page);
-}
-
 var updateChart = function(page){
-//	console.log(result.map_names);
+//	console.log(DATA.FAKE.KEYWORD_NAME)
+//	console.log(DATA.FAKE.KEYWORD_DATA)
+	vm.map_names = DATA.FAKE.KEYWORD_NAME;
+    vm.map_items = DATA.FAKE.KEYWORD_DATA;
+//	console.log(vm.map_names);
 	var start = 0
 	var end = DATA.FAKE.KEYWORD_NAME.length;
 	if(page){
@@ -205,9 +358,18 @@ var updateChart = function(page){
 	DATA.FAKE.CurrentIndex = start;
 	console.log(page + "--" + start + "--" + end)
 	
-	var dom = document.getElementById("mapid_"+DATA.FAKE.KEYWORD_NAME[start]);
-	if(!dom) return;
+//	console.log("mapid_" + DATA.FAKE.KEYWORD_NAME[start])
+	var dom = document.getElementById("mapid_"+DATA.FAKE.KEYWORD_NAME[end - 1]);
 	
+	if(!dom){
+		setTimeout(function(){
+			console.log("ww")
+			updateChart(page)
+		}, 200);
+		return;
+	}
+	
+//	console.log(dom)
 	var temp = null;
 	
 	var $mapDom = null;
@@ -220,7 +382,7 @@ var updateChart = function(page){
 		temp.setOption(getMapOptionByIndex(i, df.totalFlag));
     	DATA.FAKE.CurrentIndex = i + 1;
 		
-		if(!page) continue;
+//		if(!page) continue;
 		$mapDom = $(dom).parents(".map");
 		$mapDom.hover(function(){
 		    DATA.FAKE.CurrentIndex = $(this).attr("mapid");
