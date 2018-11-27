@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.amazon.common.entity.Keyword;
+import com.amazon.common.entity.KeywordFilter;
 import com.amazon.keyword.bo.IKeywordBo;
 import com.amazon.keyword.bo.IKeywordDetailBo;
 import com.amazon.keyword.bo.IKeywordRankBo;
@@ -69,5 +70,11 @@ public class KeywordController {
 	@ResponseBody
 	public Object setGroup(Keyword keyword){
 		return keywordBo.setGroup(keyword);
+	}
+	
+	@RequestMapping("/nlIctQueryFilterDataList")
+	@ResponseBody
+	public Object nlIctQueryFilterDataList(KeywordFilter keywordFilter){
+		return keywordBo.queryKeywordFilterList(keywordFilter);
 	}
 }

@@ -162,10 +162,10 @@
     from keyword_detail
     <where>keyword_id = #{keywordId,jdbcType=INTEGER}
     	<if test="startTime != null" >
-          and create_time  &gt;= #{startTime,jdbcType=REAL}
+          and create_time  &gt;= #{startTime,jdbcType=BIGINT}
         </if>
         <if test="endTime != null" >
-          and create_time  &lt;= #{endTime,jdbcType=REAL}
+          and create_time  &lt;= #{endTime,jdbcType=BIGINT}
         </if>
     </where>
     order by create_time asc

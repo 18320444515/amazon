@@ -66,7 +66,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="queryRankList" resultMap="BaseResultMap" parameterType="com.amazon.common.entity.KeywordDetail" >
+  <select id="queryRankList" resultMap="BaseResultMap" parameterType="com.amazon.common.entity.KeywordRank" >
     select *
     from keyword_rank
     <where>keyword_id = #{keywordId,jdbcType=INTEGER}
@@ -78,5 +78,10 @@
         </if>
     </where>
     order by create_time asc
+  </select>
+  <select id="queryLatestRank" resultMap="BaseResultMap" parameterType="com.amazon.common.entity.KeywordRank" >
+    select * from keyword_rank
+	where keyword_id = #{keywordId,jdbcType=INTEGER}
+	order by create_time desc limit 1
   </select>
 </mapper>

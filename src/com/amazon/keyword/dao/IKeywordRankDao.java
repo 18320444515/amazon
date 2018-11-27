@@ -14,5 +14,7 @@ public interface IKeywordRankDao {
     int updateByPrimaryKeySelective(KeywordRank record);
     
     List<KeywordRank> queryRankList(KeywordRank record);
+    
+    KeywordRank queryLatestRank(KeywordRank record);
 
 }

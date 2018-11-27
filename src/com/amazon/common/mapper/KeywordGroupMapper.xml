@@ -48,7 +48,7 @@
     update keyword_group
     <set >
    	  <if test="asinId != null" >
-        #{asinId,jdbcType=INTEGER},
+        asin_Id = #{asinId,jdbcType=INTEGER},
       </if>
       <if test="name != null" >
         name = #{name,jdbcType=VARCHAR},

@@ -1,6 +1,7 @@
 package com.amazon.keyword.bo;
 
 import com.amazon.common.entity.Keyword;
+import com.amazon.common.entity.KeywordFilter;
 
 public interface IKeywordBo {
 	
@@ -13,4 +14,6 @@ public interface IKeywordBo {
 	public Object txDeleteAllData();
 	
 	public int setGroup(Keyword keyword);
+	
+	public Object queryKeywordFilterList(KeywordFilter keywordFilter);
 }

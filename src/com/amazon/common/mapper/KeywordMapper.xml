@@ -119,4 +119,43 @@
     truncate table keyword_group;
     truncate table keyword_rank;
   </update>
+  <select id="queryFilterKeyword" resultMap="BaseResultMap" parameterType="com.amazon.common.entity.KeywordFilter" >
+    select k.id, k.name, k.match_type, k.asin_id, k.group_id, kg.name as group_name, sum(kd.impression) as impression,
+	ifnull(truncate(sum(kd.spend) / sum(kd.sales) * 100, 2), 0) as acos, kt.latest_time, (kt.latest_time - 7 * 86400000) as start_time
+	from keyword as k left join keyword_detail as kd on k.id = kd.keyword_id
+	left join keyword_group as kg on k.group_id = kg.id
+	left join (select k.id, max(kd.create_time) as latest_time from keyword as k
+	left join keyword_detail as kd on k.id = kd.keyword_id group by k.id) as kt on kt.id = k.id
+	where
+	<if test="fstartTime == null" >
+		kd.create_time between (kt.latest_time - #{fdays,jdbcType=INTEGER} * 86400000) and kt.latest_time
+    </if>
+    <if test="fstartTime != null" >
+		kd.create_time between #{fstartTime,jdbcType=BIGINT} and #{fendTime,jdbcType=BIGINT}
+    </if>
+	group by k.id
+	having k.asin_id = #{asinId,jdbcType=INTEGER}
+	<if test="groupId != null" >
+      and k.group_id = #{groupId,jdbcType=INTEGER}
+    </if>
+	<if test="fkeyword != null" >
+		and k.name like #{fkeyword,jdbcType=VARCHAR}
+    </if>
+	<if test="fmatchType != null" >
+		and k.match_type = #{fmatchType,jdbcType=VARCHAR}
+    </if>
+    <if test="fimpressionMin != null" >
+      and impression &gt;= #{fimpressionMin,jdbcType=INTEGER}
+    </if>
+    <if test="fimpressionMax != null" >
+      and impression &lt;= #{fimpressionMax,jdbcType=INTEGER}
+    </if>
+    <if test="facosMin != null" >
+      and acos &gt;= #{facosMin,jdbcType=REAL}
+    </if>
+    <if test="facosMax != null" >
+      and acos &lt;= #{facosMax,jdbcType=REAL}
+    </if>
+	limit #{pageStart,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+  </select>
 </mapper>

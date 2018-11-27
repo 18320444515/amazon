@@ -2,6 +2,7 @@ package com.amazon.keyword.bo;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.amazon.common.entity.Keyword;
 import com.amazon.common.entity.KeywordAsin;
 import com.amazon.common.entity.KeywordDetail;
+import com.amazon.common.entity.KeywordFilter;
 import com.amazon.common.entity.KeywordRank;
 import com.amazon.common.util.LoadDataUtil;
 import com.amazon.keyword.dao.IKeywordAsinDao;
@@ -101,31 +103,46 @@ public class KeywordBo implements IKeywordBo{
 		keywordDetail.setKeywordId(keyword.getId());
 		keywordDetail = keywordDetailDao.queryLatestDetail(keywordDetail);
 		
+		KeywordRank keywordRank = new KeywordRank();
+		keywordRank.setKeywordId(keyword.getId());
+		keywordRank = keywordRankDao.queryLatestRank(keywordRank);
+		
 		int dayFlag = keyword.getDayFlag();
 		Long startTime = keyword.getStartTime();
 		Long endTime = keyword.getEndTime();
 		Long dayMilliseconds = (long) (24 * 60 * 60 * 1000);
+		Long diffMilliseconds = null;
 		
 		if(dayFlag == 1){
-			endTime = keywordDetail.getCreateTime();
-			startTime = endTime - (dayMilliseconds * (7 - 1));
+			diffMilliseconds = dayMilliseconds * 7;
 		}else if(dayFlag == 2){
-			endTime = keywordDetail.getCreateTime();
-			startTime = endTime - (dayMilliseconds * (14 - 1));
+			diffMilliseconds = dayMilliseconds * 14;
 		}else if(dayFlag == 3){
-			endTime = keywordDetail.getCreateTime();
-			startTime = endTime - (dayMilliseconds * (30 - 1));
+			diffMilliseconds = dayMilliseconds * 30;
 		}
+		
+		if(dayFlag > 0){
+			endTime = keywordDetail.getCreateTime();
+			startTime = endTime - diffMilliseconds;
+		}
+		keywordRank = new KeywordRank();
+		keywordRank.setKeywordId(keyword.getId());
+		keywordRank = keywordRankDao.queryLatestRank(keywordRank);
+		if(keywordRank != null && endTime < keywordRank.getCreateTime()) endTime = keywordRank.getCreateTime();
+		
+		keywordRank = new KeywordRank();
+		keywordRank.setKeywordId(keyword.getId());
 		
 		keywordDetail.setStartTime(startTime);
 		keywordDetail.setEndTime(endTime);
 		
-		KeywordRank keywordRank = new KeywordRank();
-		keywordRank.setKeywordId(keyword.getId());
 		keywordRank.setStartTime(startTime);
 		keywordRank.setEndTime(endTime);
 		
 		keyword = keywordDao.selectByPrimaryKey(keyword.getId());
+		keyword.setStartTime(startTime);
+		keyword.setEndTime(endTime);
+		
 		keyword.setLatestDetail(keywordDetailDao.queryLatestDetail(keywordDetail));
 		keyword.setDetailList(keywordDetailDao.queryDetailList(keywordDetail));
 		keyword.setRankList(keywordRankDao.queryRankList(keywordRank));
@@ -146,11 +163,11 @@ public class KeywordBo implements IKeywordBo{
 		Long diffMilliseconds = null;
 		
 		if(dayFlag == 1){
-			diffMilliseconds = dayMilliseconds * (7 - 1);
+			diffMilliseconds = dayMilliseconds * 7;
 		}else if(dayFlag == 2){
-			diffMilliseconds = dayMilliseconds * (14 - 1);
+			diffMilliseconds = dayMilliseconds * 14;
 		}else if(dayFlag == 3){
-			diffMilliseconds = dayMilliseconds * (30 - 1);
+			diffMilliseconds = dayMilliseconds * 30;
 		}
 		
 		List<Integer> keywordIdList = keywordDao.queryKeywordId(keyword);
@@ -161,18 +178,26 @@ public class KeywordBo implements IKeywordBo{
 			keywordDetail.setKeywordId(existKeyword.getId());
 			keywordDetail = keywordDetailDao.queryLatestDetail(keywordDetail);
 			
-			endTime = keywordDetail.getCreateTime();
 			if(dayFlag > 0){
+				endTime = keywordDetail.getCreateTime();
 				startTime = endTime - diffMilliseconds;
 			}
+			keywordRank = new KeywordRank();
+			keywordRank.setKeywordId(existKeyword.getId());
+			keywordRank = keywordRankDao.queryLatestRank(keywordRank);
+			if(keywordRank != null && endTime < keywordRank.getCreateTime()) endTime = keywordRank.getCreateTime();
+			
+			keywordRank = new KeywordRank();
+			keywordRank.setKeywordId(existKeyword.getId());
 			
 			keywordDetail.setStartTime(startTime);
 			keywordDetail.setEndTime(endTime);
 			
-			keywordRank = new KeywordRank();
-			keywordRank.setKeywordId(existKeyword.getId());
 			keywordRank.setStartTime(startTime);
 			keywordRank.setEndTime(endTime);
+			
+			existKeyword.setStartTime(startTime);
+			existKeyword.setEndTime(endTime);
 			
 			existKeyword.setLatestDetail(keywordDetail);
 			existKeyword.setDetailList(keywordDetailDao.queryDetailList(keywordDetail));
@@ -192,6 +217,83 @@ public class KeywordBo implements IKeywordBo{
 	@Override
 	public int setGroup(Keyword keyword) {
 		return keywordDao.updateByPrimaryKeySelective(keyword);
+	}
+
+	@Override
+	public Object queryKeywordFilterList(KeywordFilter keywordFilter) {
+		List<Keyword> keywordList = new ArrayList<Keyword>();
+		KeywordDetail keywordDetail = null;
+		KeywordRank keywordRank = null;
+		Keyword existKeyword = null;
+		
+		int fdayFlag = keywordFilter.getFdayFlag();
+		Long startTime = keywordFilter.getFstartTime();
+		Long endTime = keywordFilter.getFendTime();
+		Long dayMilliseconds = (long) (24 * 60 * 60 * 1000);
+		Long diffMilliseconds = null;
+		
+		if(fdayFlag == 1){
+			diffMilliseconds = dayMilliseconds * 7;
+			keywordFilter.setFdays(7);
+		}else if(fdayFlag == 2){
+			diffMilliseconds = dayMilliseconds * 14;
+			keywordFilter.setFdays(14);
+		}else if(fdayFlag == 3){
+			diffMilliseconds = dayMilliseconds * 30;
+			keywordFilter.setFdays(30);
+		}
+		
+//		System.out.println(fdayFlag + "--" + new Date(startTime) + "--" + new Date(endTime));
+		
+		Integer ftypeFlag = keywordFilter.getFtypeFlag();
+		if(ftypeFlag != null){
+			if(ftypeFlag == 1){
+				keywordFilter.setFmatchType("EXACT");
+			}else if(ftypeFlag == 2){
+				keywordFilter.setFmatchType("BROAD");
+			}
+		}
+		
+		if(keywordFilter.getFkeyword() != null)
+		keywordFilter.setFkeyword("%" + keywordFilter.getFkeyword() + "%");
+		
+//		return keywordDao.queryFilterKeyword(keywordFilter);
+		keywordList = keywordDao.queryFilterKeyword(keywordFilter);
+		for(int i = 0;i < keywordList.size();i++){
+			existKeyword = keywordList.get(i);
+			
+			keywordDetail = new KeywordDetail();
+			keywordDetail.setKeywordId(existKeyword.getId());
+			keywordDetail = keywordDetailDao.queryLatestDetail(keywordDetail);
+			
+			if(fdayFlag > 0){
+				endTime = keywordDetail.getCreateTime();
+				startTime = endTime - diffMilliseconds;
+			}
+			keywordRank = new KeywordRank();
+			keywordRank.setKeywordId(existKeyword.getId());
+			keywordRank = keywordRankDao.queryLatestRank(keywordRank);
+			if(keywordRank != null && endTime < keywordRank.getCreateTime()) endTime = keywordRank.getCreateTime();
+			
+			keywordRank = new KeywordRank();
+			keywordRank.setKeywordId(existKeyword.getId());
+			
+			keywordDetail.setStartTime(startTime);
+			keywordDetail.setEndTime(endTime);
+			
+			keywordRank.setStartTime(startTime);
+			keywordRank.setEndTime(endTime);
+			
+			existKeyword.setStartTime(startTime);
+			existKeyword.setEndTime(endTime);
+			
+			existKeyword.setLatestDetail(keywordDetail);
+			existKeyword.setDetailList(keywordDetailDao.queryDetailList(keywordDetail));
+			existKeyword.setRankList(keywordRankDao.queryRankList(keywordRank));
+			
+//			keywordList.add(existKeyword);
+		}
+		return keywordList;
 	}
 
 }

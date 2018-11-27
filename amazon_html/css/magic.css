@@ -1,0 +1,245 @@
+p{
+	font-size: 12px;
+}
+.demo-block{
+	margin: 10% 5% 5% 5%;
+	text-align: center;
+}
+
+.fixed-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1030;
+}
+
+.tools{
+	/*position: fixed;*/
+	top: 45px;
+	left: 0px;
+	width: 60px;
+	height: 100%;
+	/*background-color: black;*/
+}
+
+.main{
+	
+	/*background-color: blue;*/
+	padding: 18px 50px 0px 40px;
+}
+
+.filter{
+	/*text-align: center;*/
+	position: relative;
+	margin-bottom: 20px;
+}
+
+.hidden_div{
+	z-index: 9;
+	position: fixed;
+	text-align: left;
+	display: none;
+}
+.hidden_div.active{
+	display: block;
+}
+
+.hidden_block{
+	padding: 9px;
+	font-size: 10px;
+}
+
+.input_row{
+	display: flex;
+}
+
+.thres_input{
+	width: 39%;
+	margin: 1% 7%;
+}
+
+.map{
+	margin: 0px 0px 80px 0px;
+}
+
+.all{
+	margin: 0px 0px 0px 0px;
+}
+
+.all2{
+	top: 45px;
+	left: 45px;
+}
+.map-title{
+	font-size: 15px;
+	display: block;
+}
+
+.map_head{
+	display: flex;
+}
+
+.map_else{
+	/*display: block;*/
+}
+
+.map_button{
+    /*right: 0px;*/
+    position: relative;
+    display: block;
+    height: 60px;
+    /*left: 64%;*/
+}
+.map_button>.button-box{
+	position: absolute;
+	right: 0;
+}
+.button-box>button{
+    background-color: rgb(218, 225, 231);
+    color: rgb(117, 117, 117);
+}
+.button-box>button.active{
+	background-color: #328BC7;
+	color: white;
+}
+.button-box>.time-input{
+	position: relative;
+	display: inline-block;
+	
+}
+.filter-title{
+	position: relative;
+	font-size: 26px;
+	margin-right: 20px;
+}
+.time-input>input{
+	position: relative;
+	display: inline-block;
+}
+.more-btn{
+	position: relative;
+	padding: 20px 0;
+	text-align: center;
+	font-size: 16px;
+	background-color: #232323;
+	color: #fff;
+	cursor: pointer;
+	margin-bottom: 30px;
+}
+#total_button{
+	padding: 10px 20px;
+	border-radius:5px;
+	background-color: #f5f5f5;
+	color: #333;
+	margin-right: 10px;
+}
+#total_button.active{
+	background-color: #f04124;
+	color: #fff;
+}
+#delete_button{
+	padding: 10px 20px;
+	border-radius:5px;
+	background-color: #000;
+	color: #fff;
+	margin-right: 10px;
+}
+.all{
+	padding-left: 140px;
+}
+.asin-box{
+	position: fixed;
+	left: 20px;
+	top: 62px;
+	width: 120px;
+	text-align: center;
+}
+.asin-box>.asin-list{
+	position: relative;
+}
+.asin-btn{
+	position: relative;
+	margin: 20px 0;
+	border: 1px solid #cecece;
+	padding: 8px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.asin-btn.active{
+	background-color: #379230;
+	color: #fff;
+}
+.group-box{
+	position: relative;
+	text-align: center;
+	margin-top: 15px;
+}
+.group-box>.group-value{
+	position: relative;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	cursor: pointer;
+	user-select: none;
+}
+.group-box>.group-list{
+	position: relative;
+	margin: 0;
+	margin-top: 4px;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	list-style:none;
+	display: none;
+}
+.group-list.active{
+	display: block;
+}
+.group-list>li{
+	position: relative;
+	padding: 3px 0;
+	border-bottom: 1px solid #aaa;
+	cursor: pointer;
+}
+.group-list>li:last-child{
+	border-bottom: none;
+}
+.no-select{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -ms-user-select: none;
+}
+.filter>button{
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+.filter-radio{
+	position: relative;
+	padding: 20px 20px;
+}
+.filter-radio>.left-box{
+	position: relative;
+	
+}
+.radio-btn{
+	position: relative;
+	display: inline-block;
+	padding: 5px 10px;
+	background-color: #F5F5F5;
+	color: #333;
+	cursor: pointer;
+	border-radius: 3px;
+	-webkit-user-select: none;
+  	-moz-user-select: none;
+  	user-select: none;
+  	-ms-user-select: none;
+}
+.radio-btn.active{
+    background-color: #328BC7;
+    color: white;
+}
+.filter-radio>.right-box{
+	position: absolute;
+	right: 30px;
+	top: 20px;
+}
